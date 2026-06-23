@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, ArrowRight, AlertCircle, CheckCircle, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { supabase } from '../utils/supabaseClient.js';
+import bcryptjs from 'bcryptjs';
 
 export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
   const [formData, setFormData] = useState({
@@ -105,7 +107,75 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
     setIsLoading(true);
 
     try {
-      // Kirim data ke backend untuk sign up
+      // 1. Try to register directly to Supabase first if available (Vercel static deployment)
+      if (supabase) {
+        // Cek username sudah ada
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id')
+          .eq('username', formData.username.trim())
+          .maybeSingle();
+
+        if (existingUser) {
+          throw new Error('Username sudah terdaftar');
+        }
+
+        // Cek email sudah ada
+        const { data: existingEmail } = await supabase
+          .from('users')
+          .select('id')
+          .eq('email', formData.email.trim())
+          .maybeSingle();
+
+        if (existingEmail) {
+          throw new Error('Email sudah terdaftar');
+        }
+
+        // Hash password with bcryptjs
+        const salt = await bcryptjs.genSalt(10);
+        const passwordHash = await bcryptjs.hash(formData.password, salt);
+
+        // Insert ke database
+        const { data, error } = await supabase
+          .from('users')
+          .insert([
+            {
+              username: formData.username.trim(),
+              name: formData.name.trim(),
+              email: formData.email.trim(),
+              password_hash: passwordHash,
+              roles: formData.roles,
+              is_active: true
+            }
+          ])
+          .select()
+          .single();
+
+        if (error) {
+          throw new Error('Gagal mendaftar: ' + error.message);
+        }
+
+        setAlertInfo({
+          type: 'success',
+          message: 'Pendaftaran berhasil! Silakan login dengan akun Anda.'
+        });
+
+        setFormData({
+          username: '',
+          name: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          roles: ['Dosen']
+        });
+
+        setTimeout(() => {
+          onSignUpSuccess();
+        }, 2000);
+        return;
+      }
+
+      // 2. Fallback to Express Backend API
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const response = await fetch(`${apiUrl}/api/auth/signup`, {
         method: 'POST',
@@ -116,7 +186,7 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
           username: formData.username.trim(),
           name: formData.name.trim(),
           email: formData.email.trim(),
-          password: formData.password, // Backend akan hash password
+          password: formData.password,
           roles: formData.roles
         })
       });

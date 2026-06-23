@@ -6,6 +6,7 @@ import VennDiagram from './components/VennDiagram.jsx';
 import CryptoLab from './components/CryptoLab.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import { Binary, Info } from 'lucide-react';
+import { supabase } from './utils/supabaseClient.js';
 
 export default function App() {
   const [users, setUsers] = useState(usersDb);
@@ -15,6 +16,41 @@ export default function App() {
   const [currentRole, setCurrentRole] = useState('');
 
   const fetchUsers = async () => {
+    // 1. Try to fetch directly from Supabase first
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.from('users').select('*');
+        if (!error && Array.isArray(data)) {
+          const mappedUsers = data.map(u => ({
+            id: u.id,
+            username: u.username,
+            email: u.email,
+            name: u.name,
+            passwordCipher: u.password_hash,
+            roles: u.roles,
+            isActive: u.is_active
+          }));
+
+          setUsers(prevUsers => {
+            const merged = [...prevUsers];
+            mappedUsers.forEach(dbUser => {
+              const idx = merged.findIndex(u => u.username.toLowerCase() === dbUser.username.toLowerCase());
+              if (idx !== -1) {
+                merged[idx] = { ...merged[idx], ...dbUser };
+              } else {
+                merged.push(dbUser);
+              }
+            });
+            return merged;
+          });
+          return; // Success, skip other fallbacks
+        }
+      } catch (err) {
+        console.warn("Direct Supabase fetch failed, trying backend API URL fallback.", err);
+      }
+    }
+
+    // 2. Try to fetch from Express Backend API
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const response = await fetch(`${apiUrl}/api/auth/users`);
@@ -76,10 +112,22 @@ export default function App() {
   };
 
   // Reactively updates the user status from Admin Dashboard
-  const handleUpdateUserStatus = (userId, newStatus) => {
+  const handleUpdateUserStatus = async (userId, newStatus) => {
     setUsers(prevUsers => 
       prevUsers.map(u => u.id === userId ? { ...u, isActive: newStatus } : u)
     );
+
+    // Sync to Supabase directly if available
+    if (supabase) {
+      try {
+        await supabase
+          .from('users')
+          .update({ is_active: newStatus })
+          .eq('id', userId);
+      } catch (err) {
+        console.error("Failed to update status in Supabase:", err);
+      }
+    }
     
     // Sync active session if admin suspends themselves (unlikely but handles state edge cases)
     if (currentUser && currentUser.id === userId) {

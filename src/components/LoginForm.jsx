@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { authenticateUser } from '../utils/mathLogic.js';
 import { sha256 } from '../utils/crypto.js';
 import { ShieldAlert, ShieldCheck, KeyRound, Monitor, ArrowRight, RotateCcw, Sparkles, UserRound } from 'lucide-react';
+import { supabase } from '../utils/supabaseClient.js';
+import bcryptjs from 'bcryptjs';
 
 const DEMO_ACCOUNTS = [
   { username: 'budi', password: 'budi123', role: 'Admin', tag: 'A ∩ D', color: 'petal-frost' },
@@ -95,6 +97,133 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
       return;
     }
 
+    // 1. Try direct Supabase login verification first (Frontend-only connection for Vercel)
+    if (supabase) {
+      try {
+        const { data: user, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('username', username.trim())
+          .single();
+
+        if (error || !user) {
+          await supabase.from('login_logs').insert({
+            username: username.trim(),
+            login_status: 'failed_not_found',
+            ip_address: 'client-side'
+          });
+
+          setAlertInfo({
+            type: 'error',
+            code: 'INVALID_CREDENTIALS',
+            message: 'Username atau password salah.'
+          });
+          return;
+        }
+
+        if (!user.is_active) {
+          await supabase.from('login_logs').insert({
+            user_id: user.id,
+            username: username.trim(),
+            login_status: 'failed_inactive',
+            ip_address: 'client-side'
+          });
+
+          setAlertInfo({
+            type: 'error',
+            code: 'ACCOUNT_SUSPENDED',
+            message: 'Akun ini telah ditangguhkan.'
+          });
+          return;
+        }
+
+        if (!user.roles.includes(selectedRole)) {
+          setAlertInfo({
+            type: 'error',
+            code: 'INVALID_ROLE',
+            message: 'User tidak memiliki role ini.'
+          });
+          return;
+        }
+
+        let isMatch = false;
+        if (user.password_hash.startsWith('$2a$') || user.password_hash.startsWith('$2b$')) {
+          isMatch = await bcryptjs.compare(password, user.password_hash);
+        } else {
+          isMatch = password === user.password_hash || sha256(password) === user.password_hash;
+        }
+
+        if (!isMatch) {
+          await supabase.from('login_logs').insert({
+            user_id: user.id,
+            username: username.trim(),
+            login_status: 'failed_password',
+            ip_address: 'client-side'
+          });
+
+          setAlertInfo({
+            type: 'error',
+            code: 'INVALID_CREDENTIALS',
+            message: 'Username atau password salah.'
+          });
+          return;
+        }
+
+        if (!captchaValid && !rememberDevice) {
+          setAlertInfo({
+            type: 'error',
+            code: 'CAPTCHA_INVALID',
+            message: 'Login Gagal: Perangkat baru dan Captcha tidak valid.'
+          });
+          refreshCaptcha();
+          return;
+        }
+
+        await supabase.from('login_logs').insert({
+          user_id: user.id,
+          username: username.trim(),
+          login_status: 'success',
+          ip_address: 'client-side'
+        });
+
+        if (rememberDevice) {
+          await supabase.from('trusted_devices').upsert({
+            user_id: user.id,
+            device_identifier: 'simulated-device-id',
+            device_name: 'Browser Sandbox',
+            last_used_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id,device_identifier'
+          });
+        }
+
+        setAlertInfo({
+          type: 'success',
+          code: rememberDevice ? 'SUCCESS_TRUSTED' : 'SUCCESS_CAPTCHA',
+          message: 'Login berhasil.'
+        });
+
+        const loggedInUser = {
+          id: user.id,
+          username: user.username,
+          name: user.name,
+          email: user.email,
+          roles: user.roles,
+          isActive: user.is_active,
+          passwordCipher: user.password_hash
+        };
+
+        setTimeout(() => {
+          onLoginSuccess(loggedInUser, selectedRole);
+        }, 1500);
+        return;
+
+      } catch (err) {
+        console.warn("Direct Supabase login failed, trying backend API URL fallback.", err);
+      }
+    }
+
+    // 2. Fallback to Express Backend API
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const response = await fetch(`${apiUrl}/api/auth/login`, {
