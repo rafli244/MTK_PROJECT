@@ -107,18 +107,8 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
           .single();
 
         if (error || !user) {
-          await supabase.from('login_logs').insert({
-            username: username.trim(),
-            login_status: 'failed_not_found',
-            ip_address: 'client-side'
-          });
-
-          setAlertInfo({
-            type: 'error',
-            code: 'INVALID_CREDENTIALS',
-            message: 'Username atau password salah.'
-          });
-          return;
+          // User not found in Supabase (or query blocked by RLS policies), fall back to Express API / local dummyDb
+          throw new Error("User not found in Supabase, falling back.");
         }
 
         if (!user.is_active) {
