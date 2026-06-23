@@ -23,7 +23,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
   const [detectedUser, setDetectedUser] = useState(null);
 
   const allRoles = Array.from(new Set(users.flatMap((user) => user.roles)));
-  const roleOptions = detectedUser ? detectedUser.roles : allRoles;
+  const roleOptions = allRoles;
 
   useEffect(() => {
     if (!selectedRole && allRoles.length > 0) {
@@ -37,10 +37,6 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
     if (user) {
       setDetectedUser(user);
       onInputChange(username, password, user.passwordCipher);
-
-      if (!user.roles.includes(selectedRole) || !selectedRole) {
-        setSelectedRole(user.roles[0]);
-      }
     } else {
       setDetectedUser(null);
       onInputChange(username, password, null);
@@ -216,7 +212,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
     <div className="flex flex-col gap-6">
       {/* Dynamic Alerts */}
       {alertInfo && (
-        <div className={`p-4 rounded-xl border flex gap-3 transition-all duration-300 ${
+        <div className={`p-4 rounded-xl border flex gap-3 ${
           alertInfo.type === 'success'
             ? 'bg-lavender-950/50 border-lavender-400/30 text-lavender-200'
             : 'bg-petal-frost-950/50 border-petal-frost-500/30 text-petal-frost-200'
@@ -241,7 +237,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
       )}
 
       {/* Demo Accounts */}
-      <div className="glass-panel p-4 rounded-2xl card-hover">
+      <div className="glass-panel p-4 rounded-2xl">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-3.5 h-3.5 text-lavender-400" />
           <span className="text-xs font-semibold text-parchment-300">Akun Demo — klik untuk mengisi otomatis</span>
@@ -252,7 +248,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
               key={account.username}
               type="button"
               onClick={() => fillDemoAccount(account)}
-              className={`demo-chip text-[10px] font-mono-custom px-2.5 py-1.5 rounded-lg border ${chipColorClass[account.color]}`}
+              className={`text-[10px] font-mono-custom px-2.5 py-1.5 rounded-lg border cursor-pointer ${chipColorClass[account.color]}`}
             >
               <UserRound className="w-3 h-3 inline mr-1 -mt-px" />
               {account.username} · {account.tag}
@@ -262,7 +258,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
       </div>
 
       {/* Main Glass Form Panel */}
-      <div className="glass-panel panel-accent-top p-6 rounded-2xl card-hover">
+      <div className="glass-panel panel-accent-top p-6 rounded-2xl">
         <div className="mb-6 text-center pt-1">
           <h2 className="text-xl font-bold text-parchment-50 glow-text-purple">Sistem Otentikasi Kontekstual</h2>
           <p className="text-xs text-parchment-400 mt-1">
@@ -324,7 +320,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
               <button
                 type="button"
                 onClick={refreshCaptcha}
-                className="inline-flex items-center gap-1 rounded-lg border border-parchment-700/40 px-3 py-2 text-[11px] text-parchment-300 hover:bg-deep-navy-900/60 transition-all"
+                className="inline-flex items-center gap-1 rounded-lg border border-parchment-700/40 px-3 py-2 text-[11px] text-parchment-300 hover:bg-deep-navy-900/60"
               >
                 <RotateCcw className="w-3.5 h-3.5" /> Refresh
               </button>
@@ -370,7 +366,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
               <button
                 type="button"
                 onClick={onSignUp}
-                className="text-lavender-300 hover:text-lavender-200 font-semibold transition-colors cursor-pointer"
+                className="text-lavender-300 hover:text-lavender-200 font-semibold cursor-pointer"
               >
                 Daftar di sini
               </button>
@@ -388,23 +384,23 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
 
         {/* Variables state indicators */}
         <div className="grid grid-cols-4 gap-2 text-center text-xs font-mono-custom mb-4">
-          <div className={`p-1.5 rounded-lg border transition-all ${
-            pVal ? 'bg-lavender-950/40 border-lavender-400/40 text-lavender-300 font-bold' : 'bg-deep-navy-950/60 border-parchment-900/40 text-parchment-500'
+          <div className={`p-1.5 rounded-lg border ${
+            pVal ? 'bg-emerald-50 border-emerald-500 text-emerald-700 font-bold shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-rose-50 border-rose-300 text-rose-700'
           }`}>
             p (Kredensial): {pVal ? 'T' : 'F'}
           </div>
-          <div className={`p-1.5 rounded-lg border transition-all ${
-            qVal ? 'bg-lavender-950/40 border-lavender-400/40 text-lavender-300 font-bold' : 'bg-deep-navy-950/60 border-parchment-900/40 text-parchment-500'
+          <div className={`p-1.5 rounded-lg border ${
+            qVal ? 'bg-emerald-50 border-emerald-500 text-emerald-700 font-bold shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-rose-50 border-rose-300 text-rose-700'
           }`}>
             q (Aktif): {qVal ? 'T' : 'F'}
           </div>
-          <div className={`p-1.5 rounded-lg border transition-all ${
-            rVal ? 'bg-deep-navy-950/40 border-deep-navy-400/40 text-deep-navy-300 font-bold' : 'bg-petal-frost-950/20 border-petal-frost-900/30 text-parchment-500'
+          <div className={`p-1.5 rounded-lg border ${
+            rVal ? 'bg-emerald-50 border-emerald-500 text-emerald-700 font-bold shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-rose-50 border-rose-300 text-rose-700'
           }`}>
             r (Device): {rVal ? 'T' : 'F'}
           </div>
-          <div className={`p-1.5 rounded-lg border transition-all ${
-            sVal ? 'bg-lavender-950/40 border-lavender-400/40 text-lavender-300 font-bold' : 'bg-deep-navy-950/60 border-parchment-900/40 text-parchment-500'
+          <div className={`p-1.5 rounded-lg border ${
+            sVal ? 'bg-emerald-50 border-emerald-500 text-emerald-700 font-bold shadow-[0_0_12px_rgba(16,185,129,0.2)]' : 'bg-rose-50 border-rose-300 text-rose-700'
           }`}>
             s (Captcha): {sVal ? 'T' : 'F'}
           </div>
@@ -414,38 +410,38 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
         <div className="space-y-2 text-[11px] font-mono-custom text-parchment-400">
           <div className="flex justify-between items-center py-1 border-b border-parchment-800/25">
             <span>Irisan Utama (p ∧ q):</span>
-            <span className={pVal && qVal ? 'text-lavender-300 font-bold' : 'text-petal-frost-500'}>
+            <span className={pVal && qVal ? 'text-emerald-600 font-bold' : 'text-rose-500 font-bold'}>
               {pVal ? 'T' : 'F'} ∧ {qVal ? 'T' : 'F'} = {pVal && qVal ? 'True' : 'False'}
             </span>
           </div>
 
           <div className="flex justify-between items-center py-1 border-b border-parchment-800/25">
             <span>Term 1 - Kepercayaan Perangkat (p ∧ q ∧ r):</span>
-            <span className={term1 ? 'text-lavender-300 font-bold' : 'text-petal-frost-500'}>
+            <span className={term1 ? 'text-emerald-600 font-bold' : 'text-rose-500 font-bold'}>
               {(pVal && qVal) ? 'T' : 'F'} ∧ {rVal ? 'T' : 'F'} = {term1 ? 'True' : 'False'}
             </span>
           </div>
 
           <div className="flex justify-between items-center py-1 border-b border-parchment-800/25">
             <span>Negasi Perangkat Baru (¬r):</span>
-            <span className={!rVal ? 'text-deep-navy-300 font-bold' : 'text-petal-frost-500'}>
+            <span className={!rVal ? 'text-emerald-600 font-bold' : 'text-rose-500 font-bold'}>
               ¬({rVal ? 'T' : 'F'}) = {!rVal ? 'True' : 'False'}
             </span>
           </div>
 
           <div className="flex justify-between items-center py-1 border-b border-parchment-800/25">
             <span>Term 2 - Verifikasi Cadangan (p ∧ q ∧ ¬r ∧ s):</span>
-            <span className={term2 ? 'text-lavender-300 font-bold' : 'text-petal-frost-500'}>
+            <span className={term2 ? 'text-emerald-600 font-bold' : 'text-rose-500 font-bold'}>
               {(pVal && qVal) ? 'T' : 'F'} ∧ {!rVal ? 'T' : 'F'} ∧ {sVal ? 'T' : 'F'} = {term2 ? 'True' : 'False'}
             </span>
           </div>
 
           <div className="flex justify-between items-center pt-2 text-xs">
             <span className="font-bold text-parchment-200">Hasil Evaluasi Boolean (L = Term1 ∨ Term2):</span>
-            <span className={`px-2 py-0.5 rounded border text-xs font-bold ${
+            <span className={`px-3 py-1 rounded border text-xs font-bold ${
               L_val 
-                ? 'bg-lavender-950 text-lavender-300 border-lavender-400' 
-                : 'bg-petal-frost-950 text-petal-frost-400 border-petal-frost-700'
+                ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-[0_0_12px_rgba(16,185,129,0.15)]' 
+                : 'bg-rose-50 border-rose-300 text-rose-700'
             }`}>
               {term1 ? 'True' : 'False'} ∨ {term2 ? 'True' : 'False'} = {L_val ? 'LOGGED IN (True)' : 'DENIED (False)'}
             </span>
@@ -468,7 +464,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
               <span className="font-mono-custom text-deep-purple-300 text-[10px]">Kelompok 3: Himpunan & Pohon Keputusan</span>
             </h4>
             
-            <div className="flex justify-center bg-deep-navy-950/40 rounded-xl p-2 border border-parchment-800/30">
+            <div className="flex justify-center bg-slate-50/50 rounded-xl p-4 border border-slate-200/80">
               <svg viewBox="0 0 400 355" className="w-full h-auto">
                 <defs>
                   <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
@@ -478,20 +474,20 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                     <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#ef4444" />
                   </marker>
                   <marker id="arrow-gray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                    <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#334155" />
+                    <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="#cbd5e1" />
                   </marker>
                 </defs>
 
                 {/* Edges / Lines with active highlight */}
                 {/* Start to p? */}
-                <line x1="200" y1="40" x2="200" y2="70" stroke="#10b981" strokeWidth="2" markerEnd="url(#arrow-green)" />
+                <line x1="200" y1="40" x2="200" y2="70" stroke="#10b981" strokeWidth="3" markerEnd="url(#arrow-green)" />
 
                 {/* p? to Gagal p */}
                 <line 
                   x1="175" y1="100" 
                   x2="95" y2="130" 
-                  stroke={pState === 'false' ? '#ef4444' : '#334155'} 
-                  strokeWidth="2" 
+                  stroke={pState === 'false' ? '#ef4444' : '#cbd5e1'} 
+                  strokeWidth={pState === 'false' ? 3.5 : 1.5} 
                   markerEnd={pState === 'false' ? 'url(#arrow-red)' : 'url(#arrow-gray)'} 
                 />
 
@@ -499,8 +495,8 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 <line 
                   x1="200" y1="100" 
                   x2="200" y2="130" 
-                  stroke={pState === 'true' ? '#10b981' : '#334155'} 
-                  strokeWidth="2" 
+                  stroke={pState === 'true' ? '#10b981' : '#cbd5e1'} 
+                  strokeWidth={pState === 'true' ? 3.5 : 1.5} 
                   markerEnd={pState === 'true' ? 'url(#arrow-green)' : 'url(#arrow-gray)'} 
                 />
 
@@ -508,8 +504,8 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 <line 
                   x1="225" y1="160" 
                   x2="305" y2="190" 
-                  stroke={qState === 'false' ? '#ef4444' : '#334155'} 
-                  strokeWidth="2" 
+                  stroke={qState === 'false' ? '#ef4444' : '#cbd5e1'} 
+                  strokeWidth={qState === 'false' ? 3.5 : 1.5} 
                   markerEnd={qState === 'false' ? 'url(#arrow-red)' : 'url(#arrow-gray)'} 
                 />
 
@@ -517,8 +513,8 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 <line 
                   x1="200" y1="160" 
                   x2="200" y2="190" 
-                  stroke={qState === 'true' ? '#10b981' : '#334155'} 
-                  strokeWidth="2" 
+                  stroke={qState === 'true' ? '#10b981' : '#cbd5e1'} 
+                  strokeWidth={qState === 'true' ? 3.5 : 1.5} 
                   markerEnd={qState === 'true' ? 'url(#arrow-green)' : 'url(#arrow-gray)'} 
                 />
 
@@ -526,8 +522,8 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 <line 
                   x1="175" y1="220" 
                   x2="120" y2="250" 
-                  stroke={rState === 'true' ? '#10b981' : '#334155'} 
-                  strokeWidth="2" 
+                  stroke={rState === 'true' ? '#10b981' : '#cbd5e1'} 
+                  strokeWidth={rState === 'true' ? 3.5 : 1.5} 
                   markerEnd={rState === 'true' ? 'url(#arrow-green)' : 'url(#arrow-gray)'} 
                 />
 
@@ -535,8 +531,8 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 <line 
                   x1="225" y1="220" 
                   x2="245" y2="250" 
-                  stroke={rState === 'false' ? '#10b981' : '#334155'} 
-                  strokeWidth="2" 
+                  stroke={rState === 'false' ? '#10b981' : '#cbd5e1'} 
+                  strokeWidth={rState === 'false' ? 3.5 : 1.5} 
                   markerEnd={rState === 'false' ? 'url(#arrow-green)' : 'url(#arrow-gray)'} 
                 />
 
@@ -544,8 +540,8 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 <line 
                   x1="235" y1="280" 
                   x2="205" y2="310" 
-                  stroke={sState === 'true' ? '#10b981' : '#334155'} 
-                  strokeWidth="2" 
+                  stroke={sState === 'true' ? '#10b981' : '#cbd5e1'} 
+                  strokeWidth={sState === 'true' ? 3.5 : 1.5} 
                   markerEnd={sState === 'true' ? 'url(#arrow-green)' : 'url(#arrow-gray)'} 
                 />
 
@@ -553,27 +549,27 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 <line 
                   x1="285" y1="280" 
                   x2="300" y2="310" 
-                  stroke={sState === 'false' ? '#ef4444' : '#334155'} 
-                  strokeWidth="2" 
+                  stroke={sState === 'false' ? '#ef4444' : '#cbd5e1'} 
+                  strokeWidth={sState === 'false' ? 3.5 : 1.5} 
                   markerEnd={sState === 'false' ? 'url(#arrow-red)' : 'url(#arrow-gray)'} 
                 />
 
                 {/* Nodes Render */}
                 
                 {/* 1. Mulai (Start) */}
-                <rect x="162" y="10" width="76" height="30" rx="6" ry="6" fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" strokeWidth="1.5" />
-                <text x="200" y="29" fill="#10b981" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="monospace">Mulai</text>
+                <rect x="162" y="10" width="76" height="30" rx="6" ry="6" fill="#ecfdf5" stroke="#10b981" strokeWidth="2.5" />
+                <text x="200" y="29" fill="#047857" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="monospace">Mulai</text>
 
                 {/* 2. p? (Kredensial) */}
                 <rect 
                   x="162" y="70" width="76" height="30" rx="6" ry="6" 
-                  fill={pState === 'inactive' ? 'rgba(30, 41, 59, 0.4)' : (pState === 'true' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)')} 
-                  stroke={pState === 'inactive' ? '#334155' : (pState === 'true' ? '#10b981' : '#ef4444')} 
-                  strokeWidth="1.5" 
+                  fill={pState === 'inactive' ? '#f8fafc' : (pState === 'true' ? '#ecfdf5' : '#fef2f2')} 
+                  stroke={pState === 'inactive' ? '#cbd5e1' : (pState === 'true' ? '#10b981' : '#ef4444')} 
+                  strokeWidth={pState === 'inactive' ? 1.5 : 3.0} 
                 />
                 <text 
                   x="200" y="89" 
-                  fill={pState === 'inactive' ? '#64748b' : (pState === 'true' ? '#10b981' : '#ef4444')} 
+                  fill={pState === 'inactive' ? '#475569' : (pState === 'true' ? '#047857' : '#b91c1c')} 
                   fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="monospace"
                 >
                   Kredensial p?
@@ -582,13 +578,13 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 {/* 3. Gagal p */}
                 <rect 
                   x="32" y="130" width="76" height="30" rx="6" ry="6" 
-                  fill={pState === 'false' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(30, 41, 59, 0.4)'} 
-                  stroke={pState === 'false' ? '#ef4444' : '#334155'} 
-                  strokeWidth="1.5" 
+                  fill={pState === 'false' ? '#fef2f2' : '#f8fafc'} 
+                  stroke={pState === 'false' ? '#ef4444' : '#cbd5e1'} 
+                  strokeWidth={pState === 'false' ? 3.0 : 1.5} 
                 />
                 <text 
                   x="70" y="149" 
-                  fill={pState === 'false' ? '#ef4444' : '#64748b'} 
+                  fill={pState === 'false' ? '#b91c1c' : '#475569'} 
                   fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="monospace"
                 >
                   Gagal (p=F)
@@ -597,13 +593,13 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 {/* 4. Akun Aktif q? */}
                 <rect 
                   x="162" y="130" width="76" height="30" rx="6" ry="6" 
-                  fill={qState === 'inactive' ? 'rgba(30, 41, 59, 0.4)' : (qState === 'true' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)')} 
-                  stroke={qState === 'inactive' ? '#334155' : (qState === 'true' ? '#10b981' : '#ef4444')} 
-                  strokeWidth="1.5" 
+                  fill={qState === 'inactive' ? '#f8fafc' : (qState === 'true' ? '#ecfdf5' : '#fef2f2')} 
+                  stroke={qState === 'inactive' ? '#cbd5e1' : (qState === 'true' ? '#10b981' : '#ef4444')} 
+                  strokeWidth={qState === 'inactive' ? 1.5 : 3.0} 
                 />
                 <text 
                   x="200" y="149" 
-                  fill={qState === 'inactive' ? '#64748b' : (qState === 'true' ? '#10b981' : '#ef4444')} 
+                  fill={qState === 'inactive' ? '#475569' : (qState === 'true' ? '#047857' : '#b91c1c')} 
                   fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="monospace"
                 >
                   Akun Aktif q?
@@ -612,13 +608,13 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 {/* 5. Gagal q */}
                 <rect 
                   x="292" y="190" width="76" height="30" rx="6" ry="6" 
-                  fill={qState === 'false' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(30, 41, 59, 0.4)'} 
-                  stroke={qState === 'false' ? '#ef4444' : '#334155'} 
-                  strokeWidth="1.5" 
+                  fill={qState === 'false' ? '#fef2f2' : '#f8fafc'} 
+                  stroke={qState === 'false' ? '#ef4444' : '#cbd5e1'} 
+                  strokeWidth={qState === 'false' ? 3.0 : 1.5} 
                 />
                 <text 
                   x="330" y="209" 
-                  fill={qState === 'false' ? '#ef4444' : '#64748b'} 
+                  fill={qState === 'false' ? '#b91c1c' : '#475569'} 
                   fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="monospace"
                 >
                   Gagal (q=F)
@@ -627,13 +623,13 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 {/* 6. Device r? */}
                 <rect 
                   x="162" y="190" width="76" height="30" rx="6" ry="6" 
-                  fill={rState === 'inactive' ? 'rgba(30, 41, 59, 0.4)' : 'rgba(16, 185, 129, 0.15)'} 
-                  stroke={rState === 'inactive' ? '#334155' : '#10b981'} 
-                  strokeWidth="1.5" 
+                  fill={rState === 'inactive' ? '#f8fafc' : (rState === 'true' ? '#ecfdf5' : '#eff6ff')} 
+                  stroke={rState === 'inactive' ? '#cbd5e1' : (rState === 'true' ? '#10b981' : '#3b82f6')} 
+                  strokeWidth={rState === 'inactive' ? 1.5 : 3.0} 
                 />
                 <text 
                   x="200" y="209" 
-                  fill={rState === 'inactive' ? '#64748b' : '#10b981'} 
+                  fill={rState === 'inactive' ? '#475569' : (rState === 'true' ? '#047857' : '#1d4ed8')} 
                   fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="monospace"
                 >
                   Device r?
@@ -642,13 +638,13 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 {/* 7. Sukses r */}
                 <rect 
                   x="62" y="250" width="76" height="30" rx="6" ry="6" 
-                  fill={rState === 'true' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(30, 41, 59, 0.4)'} 
-                  stroke={rState === 'true' ? '#10b981' : '#334155'} 
-                  strokeWidth="1.5" 
+                  fill={rState === 'true' ? '#ecfdf5' : '#f8fafc'} 
+                  stroke={rState === 'true' ? '#10b981' : '#cbd5e1'} 
+                  strokeWidth={rState === 'true' ? 3.0 : 1.5} 
                 />
                 <text 
                   x="100" y="269" 
-                  fill={rState === 'true' ? '#10b981' : '#64748b'} 
+                  fill={rState === 'true' ? '#047857' : '#475569'} 
                   fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="monospace"
                 >
                   Sukses (L=T)
@@ -657,13 +653,13 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 {/* 8. Captcha s? */}
                 <rect 
                   x="222" y="250" width="76" height="30" rx="6" ry="6" 
-                  fill={rState === 'false' ? (sState === 'inactive' ? 'rgba(30, 41, 59, 0.4)' : (sState === 'true' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)')) : 'rgba(30, 41, 59, 0.4)'} 
-                  stroke={rState === 'false' ? (sState === 'inactive' ? '#334155' : (sState === 'true' ? '#10b981' : '#ef4444')) : '#334155'} 
-                  strokeWidth="1.5" 
+                  fill={rState === 'false' ? (sState === 'inactive' ? '#f8fafc' : (sState === 'true' ? '#ecfdf5' : '#fef2f2')) : '#f8fafc'} 
+                  stroke={rState === 'false' ? (sState === 'inactive' ? '#cbd5e1' : (sState === 'true' ? '#10b981' : '#ef4444')) : '#cbd5e1'} 
+                  strokeWidth={rState === 'false' ? (sState === 'inactive' ? 1.5 : 3.0) : 1.5} 
                 />
                 <text 
                   x="260" y="269" 
-                  fill={rState === 'false' ? (sState === 'inactive' ? '#64748b' : (sState === 'true' ? '#10b981' : '#ef4444')) : '#64748b'} 
+                  fill={rState === 'false' ? (sState === 'inactive' ? '#475569' : (sState === 'true' ? '#047857' : '#b91c1c')) : '#475569'} 
                   fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="monospace"
                 >
                   Captcha s?
@@ -672,13 +668,13 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 {/* 9. Sukses s */}
                 <rect 
                   x="162" y="310" width="76" height="30" rx="6" ry="6" 
-                  fill={sState === 'true' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(30, 41, 59, 0.4)'} 
-                  stroke={sState === 'true' ? '#10b981' : '#334155'} 
-                  strokeWidth="1.5" 
+                  fill={sState === 'true' ? '#ecfdf5' : '#f8fafc'} 
+                  stroke={sState === 'true' ? '#10b981' : '#cbd5e1'} 
+                  strokeWidth={sState === 'true' ? 3.0 : 1.5} 
                 />
                 <text 
                   x="200" y="329" 
-                  fill={sState === 'true' ? '#10b981' : '#64748b'} 
+                  fill={sState === 'true' ? '#047857' : '#475569'} 
                   fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="monospace"
                 >
                   Sukses (L=T)
@@ -687,13 +683,13 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 {/* 10. Gagal s */}
                 <rect 
                   x="282" y="310" width="76" height="30" rx="6" ry="6" 
-                  fill={sState === 'false' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(30, 41, 59, 0.4)'} 
-                  stroke={sState === 'false' ? '#ef4444' : '#334155'} 
-                  strokeWidth="1.5" 
+                  fill={sState === 'false' ? '#fef2f2' : '#f8fafc'} 
+                  stroke={sState === 'false' ? '#ef4444' : '#cbd5e1'} 
+                  strokeWidth={sState === 'false' ? 3.0 : 1.5} 
                 />
                 <text 
                   x="320" y="329" 
-                  fill={sState === 'false' ? '#ef4444' : '#64748b'} 
+                  fill={sState === 'false' ? '#b91c1c' : '#475569'} 
                   fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="monospace"
                 >
                   Gagal (s=F)

@@ -83,11 +83,11 @@ export default function VennDiagram({ highlightedUser, users }) {
   const activeUserRegion = getUserRegion(highlightedUser);
 
   return (
-    <div className="glass-panel-neon-purple panel-accent-top p-6 rounded-2xl flex flex-col h-full card-hover">
+    <div className="glass-panel-neon-purple panel-accent-top p-6 rounded-2xl flex flex-col h-full">
       <div className="flex items-center justify-between mb-4 border-b border-deep-purple-500/20 pb-3">
         <div>
           <h3 className="text-lg font-semibold text-deep-purple-200 flex items-center gap-2">
-            <span className="flex h-2.5 w-2.5 rounded-full bg-deep-purple-400 animate-pulse"></span>
+            <span className="flex h-2.5 w-2.5 rounded-full bg-deep-purple-400"></span>
             Visualisasi Teori Himpunan (Venn Diagram)
           </h3>
           <p className="text-xs text-parchment-400 mt-0.5">
@@ -117,7 +117,7 @@ export default function VennDiagram({ highlightedUser, users }) {
               d="M 150,135 m -80,0 a 80,80 0 1,0 160,0 a 80,80 0 1,0 -160,0"
               fill={
                 selectedRegion === 'AdminOnly' || activeUserRegion === 'AdminOnly'
-                  ? 'rgba(203, 52, 193, 0.45)'
+                  ? 'rgba(203, 52, 193, 0.70)'
                   : 'rgba(203, 52, 193, 0.12)'
               }
               stroke={
@@ -126,9 +126,9 @@ export default function VennDiagram({ highlightedUser, users }) {
                   : 'rgba(203, 52, 193, 0.4)'
               }
               strokeWidth={
-                selectedRegion === 'AdminOnly' || activeUserRegion === 'AdminOnly' ? 3 : 1.5
+                selectedRegion === 'AdminOnly' || activeUserRegion === 'AdminOnly' ? 4 : 1.5
               }
-              className="cursor-pointer transition-all duration-300"
+              className="cursor-pointer"
               onClick={() => handleRegionClick('AdminOnly')}
             />
 
@@ -136,7 +136,7 @@ export default function VennDiagram({ highlightedUser, users }) {
               d="M 250,135 m -80,0 a 80,80 0 1,0 160,0 a 80,80 0 1,0 -160,0"
               fill={
                 selectedRegion === 'DosenOnly' || activeUserRegion === 'DosenOnly'
-                  ? 'rgba(66, 97, 189, 0.45)'
+                  ? 'rgba(66, 97, 189, 0.70)'
                   : 'rgba(66, 97, 189, 0.12)'
               }
               stroke={
@@ -145,9 +145,9 @@ export default function VennDiagram({ highlightedUser, users }) {
                   : 'rgba(66, 97, 189, 0.4)'
               }
               strokeWidth={
-                selectedRegion === 'DosenOnly' || activeUserRegion === 'DosenOnly' ? 3 : 1.5
+                selectedRegion === 'DosenOnly' || activeUserRegion === 'DosenOnly' ? 4 : 1.5
               }
-              className="cursor-pointer transition-all duration-300"
+              className="cursor-pointer"
               onClick={() => handleRegionClick('DosenOnly')}
             />
 
@@ -158,7 +158,7 @@ export default function VennDiagram({ highlightedUser, users }) {
               clipPath="url(#circleD)"
               fill={
                 selectedRegion === 'Intersection' || activeUserRegion === 'Intersection'
-                  ? 'rgba(227, 28, 194, 0.5)'
+                  ? 'rgba(227, 28, 194, 0.75)'
                   : 'rgba(213, 93, 205, 0.25)'
               }
               stroke={
@@ -167,9 +167,9 @@ export default function VennDiagram({ highlightedUser, users }) {
                   : 'rgba(213, 93, 205, 0.6)'
               }
               strokeWidth={
-                selectedRegion === 'Intersection' || activeUserRegion === 'Intersection' ? 3 : 1.5
+                selectedRegion === 'Intersection' || activeUserRegion === 'Intersection' ? 4 : 1.5
               }
-              className="cursor-pointer transition-all duration-300"
+              className="cursor-pointer"
               onClick={() => handleRegionClick('Intersection')}
             />
 
@@ -180,77 +180,72 @@ export default function VennDiagram({ highlightedUser, users }) {
               D (Dosen)
             </text>
 
-            <g className={`transition-all duration-300 ${highlightedUser === 'gede' ? 'scale-110 -translate-y-0.5' : ''}`}>
+            <g>
               <circle
                 cx="110"
                 cy="110"
-                r="7"
+                r={highlightedUser === 'gede' ? 11 : 7}
                 fill={highlightedUser === 'gede' ? '#e31cc2' : '#b6169b'}
-                stroke="#f5f1f0"
-                strokeWidth={highlightedUser === 'gede' ? 2 : 1}
-                className={highlightedUser === 'gede' ? 'animate-pulse' : ''}
+                stroke={highlightedUser === 'gede' ? '#f5f1f0' : 'none'}
+                strokeWidth={highlightedUser === 'gede' ? 2.5 : 0}
               />
-              <text x="110" y="127" fill={highlightedUser === 'gede' ? '#f5f1f0' : '#d6c7c2'} fontSize="10" textAnchor="middle" fontWeight={highlightedUser === 'gede' ? 'bold' : 'normal'}>
+              <text x="110" y="129" fill={highlightedUser === 'gede' ? '#f5f1f0' : '#d6c7c2'} fontSize="10" textAnchor="middle" fontWeight={highlightedUser === 'gede' ? 'bold' : 'normal'}>
                 gede (✖)
               </text>
             </g>
 
-            <g className={`transition-all duration-300 ${highlightedUser === 'anto' ? 'scale-110 -translate-y-0.5' : ''}`}>
+            <g>
               <circle
                 cx="110"
                 cy="165"
-                r="7"
+                r={highlightedUser === 'anto' ? 11 : 7}
                 fill={highlightedUser === 'anto' ? '#d55dcd' : '#cb34c1'}
-                stroke="#f5f1f0"
-                strokeWidth={highlightedUser === 'anto' ? 2 : 1}
-                className={highlightedUser === 'anto' ? 'animate-pulse' : ''}
+                stroke={highlightedUser === 'anto' ? '#f5f1f0' : 'none'}
+                strokeWidth={highlightedUser === 'anto' ? 2.5 : 0}
               />
-              <text x="110" y="182" fill={highlightedUser === 'anto' ? '#f5f1f0' : '#d6c7c2'} fontSize="10" textAnchor="middle" fontWeight={highlightedUser === 'anto' ? 'bold' : 'normal'}>
+              <text x="110" y="184" fill={highlightedUser === 'anto' ? '#f5f1f0' : '#d6c7c2'} fontSize="10" textAnchor="middle" fontWeight={highlightedUser === 'anto' ? 'bold' : 'normal'}>
                 anto (✔)
               </text>
             </g>
 
-            <g className={`transition-all duration-300 ${highlightedUser === 'siti' ? 'scale-110 -translate-y-0.5' : ''}`}>
+            <g>
               <circle
                 cx="290"
                 cy="110"
-                r="7"
+                r={highlightedUser === 'siti' ? 11 : 7}
                 fill={highlightedUser === 'siti' ? '#6881ca' : '#4261bd'}
-                stroke="#f5f1f0"
-                strokeWidth={highlightedUser === 'siti' ? 2 : 1}
-                className={highlightedUser === 'siti' ? 'animate-pulse' : ''}
+                stroke={highlightedUser === 'siti' ? '#f5f1f0' : 'none'}
+                strokeWidth={highlightedUser === 'siti' ? 2.5 : 0}
               />
-              <text x="290" y="127" fill={highlightedUser === 'siti' ? '#f5f1f0' : '#d6c7c2'} fontSize="10" textAnchor="middle" fontWeight={highlightedUser === 'siti' ? 'bold' : 'normal'}>
+              <text x="290" y="129" fill={highlightedUser === 'siti' ? '#f5f1f0' : '#d6c7c2'} fontSize="10" textAnchor="middle" fontWeight={highlightedUser === 'siti' ? 'bold' : 'normal'}>
                 siti (✔)
               </text>
             </g>
 
-            <g className={`transition-all duration-300 ${highlightedUser === 'dewi' ? 'scale-110 -translate-y-0.5' : ''}`}>
+            <g>
               <circle
                 cx="290"
                 cy="165"
-                r="7"
+                r={highlightedUser === 'dewi' ? 11 : 7}
                 fill={highlightedUser === 'dewi' ? '#6881ca' : '#4261bd'}
-                stroke="#f5f1f0"
-                strokeWidth={highlightedUser === 'dewi' ? 2 : 1}
-                className={highlightedUser === 'dewi' ? 'animate-pulse' : ''}
+                stroke={highlightedUser === 'dewi' ? '#f5f1f0' : 'none'}
+                strokeWidth={highlightedUser === 'dewi' ? 2.5 : 0}
               />
-              <text x="290" y="182" fill={highlightedUser === 'dewi' ? '#f5f1f0' : '#d6c7c2'} fontSize="10" textAnchor="middle" fontWeight={highlightedUser === 'dewi' ? 'bold' : 'normal'}>
+              <text x="290" y="184" fill={highlightedUser === 'dewi' ? '#f5f1f0' : '#d6c7c2'} fontSize="10" textAnchor="middle" fontWeight={highlightedUser === 'dewi' ? 'bold' : 'normal'}>
                 dewi (✔)
               </text>
             </g>
 
-            <g className={`transition-all duration-300 ${highlightedUser === 'budi' ? 'scale-115' : ''}`}>
+            <g>
               <circle
                 cx="200"
                 cy="135"
-                r="8"
+                r={highlightedUser === 'budi' ? 12 : 8}
                 fill={highlightedUser === 'budi' ? '#e31cc2' : '#e949ce'}
-                stroke="#f5f1f0"
-                strokeWidth={2}
-                className={highlightedUser === 'budi' ? 'animate-dash' : 'animate-pulse'}
+                stroke={highlightedUser === 'budi' ? '#f5f1f0' : 'none'}
+                strokeWidth={highlightedUser === 'budi' ? 2.5 : 0}
               />
-              <text x="200" y="157" fill={highlightedUser === 'budi' ? '#fce8f9' : '#f9d2f3'} fontSize="11" fontWeight="bold" textAnchor="middle">
+              <text x="200" y="159" fill={highlightedUser === 'budi' ? '#fce8f9' : '#f9d2f3'} fontSize="11" fontWeight="bold" textAnchor="middle">
                 budi (✔)
               </text>
             </g>
@@ -300,7 +295,7 @@ export default function VennDiagram({ highlightedUser, users }) {
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2">
             <button
               onClick={() => handleRegionClick('AdminOnly')}
-              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border transition-all cursor-pointer ${
+              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border cursor-pointer ${
                 selectedRegion === 'AdminOnly'
                   ? 'bg-deep-purple-950/60 border-deep-purple-400 text-deep-purple-200 font-bold'
                   : 'bg-deep-navy-950/30 border-parchment-800/30 hover:border-deep-purple-700 text-parchment-400 hover:text-deep-purple-300'
@@ -310,7 +305,7 @@ export default function VennDiagram({ highlightedUser, users }) {
             </button>
             <button
               onClick={() => handleRegionClick('DosenOnly')}
-              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border transition-all cursor-pointer ${
+              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border cursor-pointer ${
                 selectedRegion === 'DosenOnly'
                   ? 'bg-lavender-950/60 border-lavender-400 text-lavender-200 font-bold'
                   : 'bg-deep-navy-950/30 border-parchment-800/30 hover:border-lavender-700 text-parchment-400 hover:text-lavender-300'
@@ -320,7 +315,7 @@ export default function VennDiagram({ highlightedUser, users }) {
             </button>
             <button
               onClick={() => handleRegionClick('Intersection')}
-              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border transition-all cursor-pointer ${
+              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border cursor-pointer ${
                 selectedRegion === 'Intersection'
                   ? 'bg-petal-frost-950/60 border-petal-frost-400 text-petal-frost-200 font-bold'
                   : 'bg-deep-navy-950/30 border-parchment-800/30 hover:border-petal-frost-700 text-parchment-400 hover:text-petal-frost-300'
@@ -330,7 +325,7 @@ export default function VennDiagram({ highlightedUser, users }) {
             </button>
             <button
               onClick={() => handleRegionClick('U')}
-              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border transition-all cursor-pointer ${
+              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border cursor-pointer ${
                 selectedRegion === 'U'
                   ? 'bg-parchment-800/40 border-parchment-500 text-parchment-100 font-bold'
                   : 'bg-deep-navy-950/30 border-parchment-800/30 hover:border-parchment-600 text-parchment-400 hover:text-parchment-200'
@@ -340,7 +335,7 @@ export default function VennDiagram({ highlightedUser, users }) {
             </button>
             <button
               onClick={() => handleRegionClick('Inactive')}
-              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border transition-all cursor-pointer ${
+              className={`text-[11px] font-mono-custom py-1.5 px-2 rounded border cursor-pointer ${
                 selectedRegion === 'Inactive'
                   ? 'bg-petal-frost-950/60 border-petal-frost-500 text-petal-frost-300 font-bold'
                   : 'bg-deep-navy-950/30 border-parchment-800/30 hover:border-petal-frost-800 text-parchment-400 hover:text-petal-frost-300'
@@ -350,7 +345,7 @@ export default function VennDiagram({ highlightedUser, users }) {
             </button>
             <button
               onClick={() => setSelectedRegion(null)}
-              className="text-[11px] font-mono-custom py-1.5 px-2 rounded border border-petal-frost-900/30 text-petal-frost-400 hover:bg-petal-frost-950/20 transition-all cursor-pointer"
+              className="text-[11px] font-mono-custom py-1.5 px-2 rounded border border-petal-frost-900/30 text-petal-frost-400 hover:bg-petal-frost-950/20 cursor-pointer"
             >
               Reset
             </button>

@@ -14,11 +14,11 @@ export default function CryptoLab({ inputPassword, userCiphertext, targetUsernam
   const comboAnalysis = analyzePasswordCombinations(text);
 
   return (
-    <div className="glass-panel-neon-blue panel-accent-top p-6 rounded-2xl flex flex-col h-full card-hover">
+    <div className="glass-panel-neon-blue panel-accent-top p-6 rounded-2xl flex flex-col h-full">
       <div className="flex items-center justify-between mb-4 border-b border-lavender-500/20 pb-3">
         <div>
           <h3 className="text-lg font-semibold text-lavender-200 flex items-center gap-2">
-            <span className="flex h-2.5 w-2.5 rounded-full bg-lavender-400 animate-pulse"></span>
+            <span className="flex h-2.5 w-2.5 rounded-full bg-lavender-400"></span>
             Laboratorium Hashing & Kriptografi
           </h3>
           <p className="text-xs text-parchment-400 mt-0.5">
@@ -117,19 +117,19 @@ export default function CryptoLab({ inputPassword, userCiphertext, targetUsernam
           </h4>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center mb-3">
-            <div className={`p-2 rounded-lg border transition-all ${comboAnalysis.hasNumbers ? 'bg-deep-purple-950/40 border-deep-purple-400/40 text-deep-purple-200' : 'bg-deep-navy-950/60 border-parchment-900/20 text-parchment-600'}`}>
+            <div className={`p-2 rounded-lg border ${comboAnalysis.hasNumbers ? 'bg-deep-purple-950/40 border-deep-purple-400/40 text-deep-purple-200' : 'bg-deep-navy-950/60 border-parchment-900/20 text-parchment-600'}`}>
               <div className="text-[10px] font-bold">Angka (0-9)</div>
               <div className="text-xs font-mono-custom mt-0.5">{comboAnalysis.hasNumbers ? 'S = 10' : 'Tidak Aktif'}</div>
             </div>
-            <div className={`p-2 rounded-lg border transition-all ${comboAnalysis.hasLowercase ? 'bg-deep-purple-950/40 border-deep-purple-400/40 text-deep-purple-200' : 'bg-deep-navy-950/60 border-parchment-900/20 text-parchment-600'}`}>
+            <div className={`p-2 rounded-lg border ${comboAnalysis.hasLowercase ? 'bg-deep-purple-950/40 border-deep-purple-400/40 text-deep-purple-200' : 'bg-deep-navy-950/60 border-parchment-900/20 text-parchment-600'}`}>
               <div className="text-[10px] font-bold">Huruf Kecil (a-z)</div>
               <div className="text-xs font-mono-custom mt-0.5">{comboAnalysis.hasLowercase ? 'S = 26' : 'Tidak Aktif'}</div>
             </div>
-            <div className={`p-2 rounded-lg border transition-all ${comboAnalysis.hasUppercase ? 'bg-deep-purple-950/40 border-deep-purple-400/40 text-deep-purple-200' : 'bg-deep-navy-950/60 border-parchment-900/20 text-parchment-600'}`}>
+            <div className={`p-2 rounded-lg border ${comboAnalysis.hasUppercase ? 'bg-deep-purple-950/40 border-deep-purple-400/40 text-deep-purple-200' : 'bg-deep-navy-950/60 border-parchment-900/20 text-parchment-600'}`}>
               <div className="text-[10px] font-bold">Huruf Besar (A-Z)</div>
               <div className="text-xs font-mono-custom mt-0.5">{comboAnalysis.hasUppercase ? 'S = 26' : 'Tidak Aktif'}</div>
             </div>
-            <div className={`p-2 rounded-lg border transition-all ${comboAnalysis.hasSymbols ? 'bg-deep-purple-950/40 border-deep-purple-400/40 text-deep-purple-200' : 'bg-deep-navy-950/60 border-parchment-900/20 text-parchment-600'}`}>
+            <div className={`p-2 rounded-lg border ${comboAnalysis.hasSymbols ? 'bg-deep-purple-950/40 border-deep-purple-400/40 text-deep-purple-200' : 'bg-deep-navy-950/60 border-parchment-900/20 text-parchment-600'}`}>
               <div className="text-[10px] font-bold">Simbol (ASCII)</div>
               <div className="text-xs font-mono-custom mt-0.5">{comboAnalysis.hasSymbols ? 'S = 32' : 'Tidak Aktif'}</div>
             </div>

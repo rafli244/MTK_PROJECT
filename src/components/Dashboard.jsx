@@ -32,9 +32,9 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
   return (
     <div className="w-full space-y-6">
       {/* Dashboard Top Header */}
-      <div className="glass-panel panel-accent-top p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 card-hover">
+      <div className="glass-panel panel-accent-top p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-deep-purple-400 bg-deep-navy-900 shadow-[0_0_20px_rgba(203,52,193,0.2)]">
+          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-deep-purple-400 bg-deep-navy-900 shadow-sm">
             <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
           </div>
           <div>
@@ -58,7 +58,7 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
             <div className="flex bg-deep-navy-950 p-1.5 rounded-lg border border-parchment-800/30">
               <button
                 onClick={() => setCurrentView('Admin')}
-                className={`text-xs py-1.5 px-3 rounded-md transition-all font-semibold cursor-pointer ${
+                className={`text-xs py-1.5 px-3 rounded-md font-semibold cursor-pointer ${
                   currentView === 'Admin' 
                     ? 'bg-deep-purple-600 text-parchment-50 shadow-md' 
                     : 'text-parchment-500 hover:text-parchment-200'
@@ -68,7 +68,7 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
               </button>
               <button
                 onClick={() => setCurrentView('Dosen')}
-                className={`text-xs py-1.5 px-3 rounded-md transition-all font-semibold cursor-pointer ${
+                className={`text-xs py-1.5 px-3 rounded-md font-semibold cursor-pointer ${
                   currentView === 'Dosen' 
                     ? 'bg-lavender-600 text-parchment-50 shadow-md' 
                     : 'text-parchment-500 hover:text-parchment-200'
@@ -81,7 +81,7 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
 
           <button
             onClick={onLogout}
-            className="flex items-center gap-1.5 px-4 py-2 bg-petal-frost-950/40 border border-petal-frost-700/30 hover:border-petal-frost-500/50 hover:bg-petal-frost-950/60 text-petal-frost-300 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-petal-frost-950/40 border border-petal-frost-700/30 hover:border-petal-frost-500/50 hover:bg-petal-frost-950/60 text-petal-frost-300 text-xs font-semibold rounded-lg cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             Sign Out
@@ -90,7 +90,7 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
       </div>
 
       {currentView === 'Admin' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 space-y-6">
             <div className="glass-panel-neon-purple p-5 rounded-2xl">
               <h3 className="text-sm font-bold text-deep-purple-200 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -99,23 +99,23 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
               </h3>
               
               <div className="grid grid-cols-2 gap-4">
-                <div className="stat-card bg-deep-navy-950/50 border border-parchment-900/30 p-3 rounded-xl">
+                <div className="bg-deep-navy-950/50 border border-parchment-900/30 p-3 rounded-xl">
                   <span className="text-[10px] text-parchment-500 block uppercase font-semibold">Total Pengguna (U)</span>
                   <span className="text-2xl font-bold font-mono-custom text-parchment-100">{users.length}</span>
                 </div>
-                <div className="stat-card bg-deep-navy-950/50 border border-parchment-900/30 p-3 rounded-xl">
+                <div className="bg-deep-navy-950/50 border border-parchment-900/30 p-3 rounded-xl">
                   <span className="text-[10px] text-parchment-500 block uppercase font-semibold">Irisan Peran (A ∩ D)</span>
                   <span className="text-2xl font-bold font-mono-custom text-petal-frost-400">
                     {users.filter(u => u.roles.includes('Admin') && u.roles.includes('Dosen')).length}
                   </span>
                 </div>
-                <div className="stat-card bg-deep-navy-950/50 border border-parchment-900/30 p-3 rounded-xl">
+                <div className="bg-deep-navy-950/50 border border-parchment-900/30 p-3 rounded-xl">
                   <span className="text-[10px] text-parchment-500 block uppercase font-semibold">Total Admin (A)</span>
                   <span className="text-2xl font-bold font-mono-custom text-deep-purple-400">
                     {users.filter(u => u.roles.includes('Admin')).length}
                   </span>
                 </div>
-                <div className="stat-card bg-deep-navy-950/50 border border-parchment-900/30 p-3 rounded-xl">
+                <div className="bg-deep-navy-950/50 border border-parchment-900/30 p-3 rounded-xl">
                   <span className="text-[10px] text-parchment-500 block uppercase font-semibold">Total Dosen (D)</span>
                   <span className="text-2xl font-bold font-mono-custom text-lavender-400">
                     {users.filter(u => u.roles.includes('Dosen')).length}
@@ -173,7 +173,7 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
                   </thead>
                   <tbody className="divide-y divide-parchment-800/15 text-parchment-200">
                     {users.map(u => (
-                      <tr key={u.id} className="hover:bg-deep-navy-950/20 transition-colors">
+                      <tr key={u.id} className="hover:bg-deep-navy-950/20">
                         <td className="p-3 flex items-center gap-2.5">
                           <img src={u.avatar} alt={u.name} className="w-6 h-6 rounded-full bg-deep-navy-900" />
                           <div>
@@ -211,7 +211,7 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
                         <td className="p-3 text-right">
                           <button
                             onClick={() => onUpdateUserStatus(u.id, !u.isActive)}
-                            className={`px-3 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${
+                            className={`px-3 py-1 rounded text-[10px] font-semibold cursor-pointer ${
                               u.isActive
                                 ? 'bg-petal-frost-950/40 text-petal-frost-400 border border-petal-frost-800/40 hover:bg-petal-frost-950/70'
                                 : 'bg-lavender-950/40 text-lavender-300 border border-lavender-800/40 hover:bg-lavender-950/70'
@@ -233,7 +233,7 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 space-y-6">
             <div className="glass-panel-neon-blue p-5 rounded-2xl">
               <h3 className="text-sm font-bold text-lavender-200 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -298,7 +298,7 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
                   </thead>
                   <tbody className="divide-y divide-parchment-800/15 text-parchment-200">
                     {students.map(s => (
-                      <tr key={s.id} className="hover:bg-deep-navy-950/20 transition-colors">
+                      <tr key={s.id} className="hover:bg-deep-navy-950/20">
                         <td className="p-3 font-mono-custom text-parchment-400">{s.nim}</td>
                         <td className="p-3 font-semibold text-parchment-100">{s.name}</td>
                         <td className="p-3 text-center text-parchment-300 font-mono-custom">{s.attendance}</td>

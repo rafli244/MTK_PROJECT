@@ -5,7 +5,7 @@ import SignUpForm from './components/SignUpForm.jsx';
 import VennDiagram from './components/VennDiagram.jsx';
 import CryptoLab from './components/CryptoLab.jsx';
 import Dashboard from './components/Dashboard.jsx';
-import { Binary, ShieldAlert, GraduationCap, Info } from 'lucide-react';
+import { Binary, Info } from 'lucide-react';
 
 export default function App() {
   const [users, setUsers] = useState(usersDb);
@@ -92,9 +92,7 @@ export default function App() {
 
   return (
     <div className="app-shell min-h-screen py-6 sm:py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col justify-between">
-      <div/>
-      <div/>
-      <div/>
+
 
       {/* Top Application Navbar / Header */}
       <header className="sticky top-4 z-50 mb-8 glass-panel rounded-2xl px-5 py-4 border border-slate-200">
@@ -114,7 +112,6 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2.5">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-petal-frost-400 opacity-75 animate-ping" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-petal-frost-400" />
             </span>
             <span className="text-[11px] font-mono-custom text-parchment-400 border border-parchment-800/40 bg-deep-navy-950/60 py-1 px-2.5 rounded-lg">
@@ -130,7 +127,7 @@ export default function App() {
           /* ================= LOGIN SCREEN / LANDING PAGE ================= */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
             {/* Left Side: Auth Panel */}
-            <div className="lg:col-span-5 animate-stagger-1">
+            <div className="lg:col-span-5">
               <div className="section-label mb-3">Panel Otentikasi</div>
               {isSignUpMode ? (
                 <SignUpForm 
@@ -151,15 +148,15 @@ export default function App() {
             </div>
 
             {/* Right Side: Math Sandbox */}
-            <div className="lg:col-span-7 flex flex-col gap-6 animate-stagger-2">
+            <div className="lg:col-span-7 flex flex-col gap-6">
               <div className="section-label">Laboratorium Interaktif</div>
               {/* Sandbox Tabs */}
               <div className="glass-panel p-1.5 rounded-xl flex border border-parchment-800/25 w-fit">
                 <button
                   onClick={() => setActiveSandboxTab('venn')}
-                  className={`text-xs py-1.5 px-4 rounded-lg font-semibold transition-all cursor-pointer ${
+                  className={`text-xs py-1.5 px-4 rounded-lg font-semibold cursor-pointer ${
                     activeSandboxTab === 'venn'
-                      ? 'bg-deep-purple-600/30 text-deep-purple-200 border border-deep-purple-400/30 shadow-[0_0_16px_rgba(203,52,193,0.12)]'
+                      ? 'bg-deep-purple-600/30 text-deep-purple-200 border border-deep-purple-400/30'
                       : 'text-parchment-500 hover:text-parchment-200 border border-transparent'
                   }`}
                 >
@@ -167,9 +164,9 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setActiveSandboxTab('crypto')}
-                  className={`text-xs py-1.5 px-4 rounded-lg font-semibold transition-all cursor-pointer ${
+                  className={`text-xs py-1.5 px-4 rounded-lg font-semibold cursor-pointer ${
                     activeSandboxTab === 'crypto'
-                      ? 'bg-lavender-600/30 text-lavender-200 border border-lavender-400/30 shadow-[0_0_16px_rgba(66,97,189,0.12)]'
+                      ? 'bg-lavender-600/30 text-lavender-200 border border-lavender-400/30'
                       : 'text-parchment-500 hover:text-parchment-200 border border-transparent'
                   }`}
                 >
@@ -178,7 +175,7 @@ export default function App() {
               </div>
 
               {/* Sandbox Panels */}
-              <div key={activeSandboxTab} className="min-h-115 flex flex-col justify-between animate-tabIn">
+              <div key={activeSandboxTab} className="min-h-115 flex flex-col justify-between">
                 {activeSandboxTab === 'venn' ? (
                   <VennDiagram 
                     highlightedUser={inputUsername}
@@ -196,7 +193,7 @@ export default function App() {
           </div>
         ) : (
           /* ================= LOGGED IN DASHBOARD SCREEN ================= */
-          <div className="space-y-8 animate-fadeIn">
+          <div className="space-y-8">
             <Dashboard 
               user={currentUser}
               initialRole={currentRole}
@@ -217,14 +214,14 @@ export default function App() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setActiveSandboxTab(activeSandboxTab === 'venn' ? 'crypto' : 'venn')}
-                    className="text-[11px] font-mono-custom text-deep-purple-300 hover:text-petal-frost-200 bg-deep-purple-950/30 border border-deep-purple-500/20 py-1 px-2.5 rounded hover:bg-deep-purple-950/50 transition-all cursor-pointer"
+                    className="text-[11px] font-mono-custom text-deep-purple-300 hover:text-petal-frost-200 bg-deep-purple-950/30 border border-deep-purple-500/20 py-1 px-2.5 rounded hover:bg-deep-purple-950/50 cursor-pointer"
                   >
                     Beralih ke Lab {activeSandboxTab === 'venn' ? 'Kriptografi' : 'Teori Himpunan'}
                   </button>
                 </div>
               </div>
 
-              <div key={activeSandboxTab} className="grid grid-cols-1 gap-6 animate-tabIn">
+              <div key={activeSandboxTab} className="grid grid-cols-1 gap-6">
                 {activeSandboxTab === 'venn' ? (
                   <VennDiagram 
                     highlightedUser={currentUser.username}

@@ -107,48 +107,6 @@ body {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Animations */
-@keyframes pulseGlow {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
-}
-
-.pulse-glow {
-  animation: pulseGlow 4s infinite ease-in-out;
-}
-
-@keyframes dash {
-  to {
-    stroke-dashoffset: -40;
-  }
-}
-
-.animate-dash {
-  stroke-dasharray: 8;
-  animation: dash 2s linear infinite;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
 .gradient-text {
   color: #1F0318;
   background: none;
@@ -179,46 +137,17 @@ body {
 }
 
 .panel-accent-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
   background: linear-gradient(
     90deg,
     #7F534B,
     #8C705F
   );
-}
-
-.card-hover {
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 8px 20px rgba(0,0,0,0.08);
-}
-
-.stat-card {
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.25s ease, border-color 0.25s ease;
-}
-
-.stat-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--color-deep-purple-400) 6%, transparent), transparent 60%);
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
-}
-
-.stat-card:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--color-deep-purple-400) 25%, transparent) !important;
-}
-
-.stat-card:hover::after {
-  opacity: 1;
 }
 
 .captcha-display {
@@ -232,16 +161,6 @@ body {
   border: 1px dashed color-mix(in srgb, var(--color-lavender-400) 35%, transparent);
   color: var(--color-lavender-200);
   text-shadow: 0 0 12px color-mix(in srgb, var(--color-lavender-400) 30%, transparent);
-}
-
-.demo-chip {
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.demo-chip:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-deep-purple-500) 15%, transparent);
 }
 
 .footer-gradient-border {
@@ -266,59 +185,23 @@ body {
   opacity: 0.6;
 }
 
-/* Decorative mesh overlay */
 .app-shell {
   position: relative;
   isolation: isolate;
 }
 
-@keyframes floatOrb1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-40px, 30px) scale(1.08); }
+/* Fast Spin Animation for UX */
+.animate-spin-fast {
+  animation: spin 0.4s linear infinite;
 }
 
-@keyframes floatOrb2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(50px, -25px) scale(1.05); }
-}
-
-@keyframes floatOrb3 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-  50% { transform: translate(-30px, -40px) scale(1.1); opacity: 0.45; }
-}
-
-@keyframes tabIn {
+@keyframes spin {
   from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.99);
+    transform: rotate(0deg);
   }
   to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: rotate(360deg);
   }
-}
-
-.animate-tabIn {
-  animation: tabIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes staggerUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-stagger-1 {
-  animation: staggerUp 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.05s both;
-}
-
-.animate-stagger-2 {
-  animation: staggerUp 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both;
 }
 
 /* Custom layout reset */

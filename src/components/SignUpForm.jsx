@@ -161,7 +161,7 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Main Glass Form Panel */}
-      <div className="glass-panel panel-accent-top p-6 rounded-2xl card-hover">
+      <div className="glass-panel panel-accent-top p-6 rounded-2xl">
         <div className="mb-6 text-center pt-1">
           <h2 className="text-xl font-bold text-parchment-50 glow-text-purple">Buat Akun Baru</h2>
           <p className="text-xs text-parchment-400 mt-1">
@@ -171,7 +171,7 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
 
         {/* Alert Messages */}
         {alertInfo && (
-          <div className={`mb-6 p-4 rounded-xl border flex gap-3 transition-all duration-300 ${
+          <div className={`mb-6 p-4 rounded-xl border flex gap-3 ${
             alertInfo.type === 'success' 
               ? 'bg-lavender-950/50 border-lavender-400/30 text-lavender-200' 
               : 'bg-petal-frost-950/50 border-petal-frost-500/30 text-petal-frost-200'
@@ -328,7 +328,7 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
           >
             {isLoading ? (
               <>
-                <div className="w-4 h-4 border-2 border-parchment-100/30 border-t-parchment-100 rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-parchment-100/30 border-t-parchment-100 rounded-full animate-spin-fast" />
                 <span>Mendaftar...</span>
               </>
             ) : (
@@ -347,7 +347,7 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
             <button
               type="button"
               onClick={onSwitchToLogin}
-              className="text-lavender-300 hover:text-lavender-200 font-semibold transition-colors cursor-pointer"
+              className="text-lavender-300 hover:text-lavender-200 font-semibold cursor-pointer"
             >
               Login di sini
             </button>

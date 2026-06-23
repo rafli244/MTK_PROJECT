@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presentasi Proyek MathSecure - Sistem Autentikasi</title>
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#E5F2C9',
+            card: '#FFFFFF',
+            primary: '#7F534B',
+            secondary: '#8C705F',
+            heading: '#1F0318',
+            text: '#1E1A1D',
+            border: '#d4dcc2',
+            accent: '#5A3E39'
+          },
+          fontFamily: {
+            outfit: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- PptxGenJS CDN -->
+  <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #E5F2C9;
+      color: #1E1A1D;
+    }
+    .glass-panel {
+      background: white;
+      border: 1px solid #d4dcc2;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .slide-content-area {
+      min-height: 480px;
+    }
+    .math-formula {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(127, 83, 75, 0.08);
+      color: #7F534B;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.9em;
+    }
+    /* Simple slide entry animations */
+    @keyframes fadeInSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide-active {
+      display: block;
+      animation: fadeInSlide 0.4s ease forwards;
+    }
+    .slide-hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen py-6 px-4 md:px-8 max-w-7xl mx-auto flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="mb-6 glass-panel rounded-2xl px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 rounded-xl bg-amber-50 text-amber-700">
+        <i data-lucide="presentation" class="w-7 h-7"></i>
+      </div>
+      <div>
+        <h1 class="text-xl md:text-2xl font-bold text-heading">Slide Deck Presentasi</h1>
+        <p class="text-xs text-secondary font-medium mt-0.5">
+          Matematika Diskrit - Sistem Autentikasi Berbasis Konteks (MathSecure)
+        </p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3 flex-wrap">
+      <a href="index.html" class="flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-xl border border-secondary text-secondary hover:bg-secondary/10 transition cursor-pointer">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Kembali ke Web Utama
+      </a>
+      <button onclick="exportToPPTX()" class="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl bg-primary text-white hover:bg-accent transition shadow-sm cursor-pointer">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        Unduh File PPTX
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Slide Player Layout -->
+  <main class="grow grid grid-cols-1 lg:grid-cols-4 gap-6">
+    
+    <!-- Sidebar - Slide List -->
+    <div class="lg:col-span-1 glass-panel rounded-2xl p-4 flex flex-col justify-between overflow-y-auto max-h-[600px] lg:max-h-none">
+      <div>
+        <h2 class="text-sm font-bold uppercase tracking-wider text-heading mb-4 px-2 flex items-center gap-2">
+          <i data-lucide="list" class="w-4 h-4"></i> Daftar Slide
+        </h2>
+        <nav class="space-y-1" id="slide-nav">
+          <!-- Populated dynamically via JS -->
+        </nav>
+      </div>
+      
+      <!-- Footer Note -->
+      <div class="mt-6 pt-4 border-t border-border text-[11px] text-secondary text-center">
+        Gunakan tombol <kbd class="px-1.5 py-0.5 bg-white border border-border rounded font-mono text-[10px]">←</kbd> dan <kbd class="px-1.5 py-0.5 bg-white border border-border rounded font-mono text-[10px]">→</kbd> pada keyboard untuk navigasi cepat.
+      </div>
+    </div>
+
+    <!-- Main Slide Stage -->
+    <div class="lg:col-span-3 flex flex-col justify-between glass-panel rounded-2xl p-6 md:p-8 bg-white relative">
+      
+      <!-- Slide Stage Area -->
+      <div id="slide-stage" class="grow flex flex-col justify-center slide-content-area">
+        <!-- Slides will be inserted here dynamically -->
+      </div>
+
+      <!-- Slide Controls / Footer -->
+      <div class="mt-6 pt-6 border-t border-border flex items-center justify-between">
+        <span class="text-xs font-mono font-medium text-secondary" id="slide-counter">
+          Slide 1 dari 12
+        </span>
+        
+        <div class="flex items-center gap-2">
+          <button onclick="prevSlide()" class="p-2 rounded-xl border border-border text-secondary hover:bg-secondary/10 transition cursor-pointer" id="btn-prev">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          
+          <div class="flex gap-1" id="bullet-indicators">
+            <!-- Populated dynamically -->
+          </div>
+          
+          <button onclick="nextSlide()" class="p-2 rounded-xl border border-border text-secondary hover:bg-secondary/10 transition cursor-pointer" id="btn-next">
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <button onclick="toggleFullScreen()" class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-border text-secondary hover:bg-secondary/5 transition cursor-pointer">
+          <i data-lucide="maximize" class="w-4 h-4"></i> Layar Penuh
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer Info -->
+  <footer class="mt-6 pt-4 border-t border-border text-center text-xs text-secondary flex flex-col sm:flex-row justify-between items-center gap-3">
+    <div>
+      © 2026 Context-Aware Authentication System - Kelompok Matematika Diskrit.
+    </div>
+    <div class="font-mono text-[10px] flex gap-3 text-secondary">
+      <span>Politeknik Caltex Riau</span>
+      <span>|</span>
+      <span>Laporan Proyek Akhir</span>
+    </div>
+  </footer>
+
+  <!-- Slide Content Template Definitions -->
+  <script>
+    const slidesData = [
+      {
+        title: "Sistem Autentikasi Berbasis React dan Kriptografi XOR",
+        subtitle: "Aplikasi Simulasi Laboratorium Matematika Diskrit & Hashing SHA-256",
+        category: "JUDUL PROYEK",
+        content: `
+          <div class="text-center space-y-6">
+            <div class="inline-block p-4 rounded-2xl bg-amber-50 text-amber-700 mb-2">
+              <i data-lucide="binary" class="w-16 h-16 mx-auto animate-pulse"></i>
+            </div>
+            <h2 class="text-3xl font-extrabold text-heading tracking-tight leading-tight max-w-2xl mx-auto">
+              Sistem Autentikasi Berbasis React dan Kriptografi XOR
+            </h2>
+            <div class="h-1 w-24 bg-primary mx-auto rounded-full"></div>
+            <p class="text-md text-secondary font-medium max-w-xl mx-auto">
+              Laporan Proyek Matematika Diskrit dengan Integrasi Keamanan Jaringan dan Representasi Struktur Data Himpunan
+            </p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 max-w-3xl mx-auto">
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-border">
+                <div class="text-xs text-secondary uppercase font-bold">Anggota 1</div>
+                <div class="text-sm font-bold text-heading mt-1">M Risqullah</div>
+              </div>
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-border">
+                <div class="text-xs text-secondary uppercase font-bold">Anggota 2</div>
+                <div class="text-sm font-bold text-heading mt-1">Naufal Lingzhi</div>
+              </div>
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-border">
+                <div class="text-xs text-secondary uppercase font-bold">Anggota 3</div>
+                <div class="text-sm font-bold text-heading mt-1">Rafli Hanafi</div>
+              </div>
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-border">
+                <div class="text-xs text-secondary uppercase font-bold">Anggota 4</div>
+                <div class="text-sm font-bold text-heading mt-1">Victor</div>
+              </div>
+            </div>
+            
+            <p class="text-xs text-secondary font-semibold pt-4">
+              Dosen Pengampu: Tim Dosen Matematika Diskrit | Politeknik Caltex Riau (TA 2025/2026)
+            </p>
+          </div>
+        `
+      },
+      {
+        title: "Latar Belakang & Rumusan Masalah",
+        subtitle: "Mengapa sistem ini dikembangkan?",
+        category: "BAB I - PENDAHULUAN",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div class="space-y-4">
+              <h3 class="text-xl font-bold text-primary flex items-center gap-2">
+                <span class="p-1.5 rounded-lg bg-primary/10 text-primary"><i data-lucide="book-open" class="w-5 h-5"></i></span>
+                Latar Belakang
+              </h3>
+              <p class="text-sm text-heading leading-relaxed">
+                Autentikasi merupakan pilar penting dalam keamanan sistem. Namun, pengajaran konsep-konsep pendukung seperti <strong>Logika Proposisional</strong>, <strong>Teori Himpunan</strong>, <strong>Relasi Biner</strong>, dan <strong>Kriptografi</strong> sering kali terlalu teoritis.
+              </p>
+              <p class="text-sm text-heading leading-relaxed">
+                Aplikasi <strong>MathSecure</strong> dikembangkan untuk memberikan pemahaman praktis melalui media visual interaktif di mana mahasiswa dapat memanipulasi variabel dan langsung melihat dampaknya pada sistem keamanan.
+              </p>
+            </div>
+            
+            <div class="space-y-4 bg-amber-50/30 p-6 rounded-2xl border border-border">
+              <h3 class="text-lg font-bold text-heading flex items-center gap-2">
+                <i data-lucide="help-circle" class="text-secondary w-5 h-5"></i>
+                Rumusan Masalah
+              </h3>
+              <ul class="space-y-3 text-xs text-heading">
+                <li class="flex gap-2">
+                  <span class="text-primary font-bold">1.</span>
+                  <span>Bagaimana memodelkan kelayakan login menggunakan aljabar boolean dari berbagai parameter keamanan lingkungan?</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-primary font-bold">2.</span>
+                  <span>Bagaimana memetakan pengelompokan hak akses (Admin & Dosen) secara visual berbasis himpunan?</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-primary font-bold">3.</span>
+                  <span>Bagaimana merepresentasikan hubungan relasional antara pengguna dan peran menggunakan matriks biner?</span>
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-primary font-bold">4.</span>
+                  <span>Bagaimana menerapkan hashing aman SHA-256 dan mendemonstrasikan cipher simetris XOR?</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Tujuan & Manfaat Proyek",
+        subtitle: "Target dan dampak pengembangan sistem",
+        category: "BAB I - PENDAHULUAN",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-primary space-y-4">
+              <h3 class="text-lg font-bold text-primary flex items-center gap-2">
+                <i data-lucide="target" class="w-5 h-5"></i> Tujuan Proyek
+              </h3>
+              <ul class="space-y-3 text-xs text-heading">
+                <li class="flex gap-2 items-start">
+                  <span class="p-0.5 bg-primary/10 rounded-full text-primary"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                  <span>Mengimplementasikan formula logika proposisional pada evaluasi keamanan login di web.</span>
+                </li>
+                <li class="flex gap-2 items-start">
+                  <span class="p-0.5 bg-primary/10 rounded-full text-primary"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                  <span>Menyediakan visualisasi interaktif diagram Venn dan relasi matriks data pengguna.</span>
+                </li>
+                <li class="flex gap-2 items-start">
+                  <span class="p-0.5 bg-primary/10 rounded-full text-primary"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                  <span>Membangun laboratorium perbandingan satu-arah (SHA-256) dan bitwise XOR simetris.</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-secondary space-y-4">
+              <h3 class="text-lg font-bold text-secondary flex items-center gap-2">
+                <i data-lucide="award" class="w-5 h-5"></i> Manfaat Proyek
+              </h3>
+              <ul class="space-y-3 text-xs text-heading">
+                <li class="flex gap-2 items-start">
+                  <span class="p-0.5 bg-secondary/10 rounded-full text-secondary"><i data-lucide="plus" class="w-3.5 h-3.5"></i></span>
+                  <span><strong>Bagi Mahasiswa:</strong> Menjembatani jurang pemisah antara teori matematika diskrit yang abstrak dan implementasi perangkat lunak nyata.</span>
+                </li>
+                <li class="flex gap-2 items-start">
+                  <span class="p-0.5 bg-secondary/10 rounded-full text-secondary"><i data-lucide="plus" class="w-3.5 h-3.5"></i></span>
+                  <span><strong>Bagi Keamanan Web:</strong> Menunjukkan efektivitas <i>Context-Aware Security</i> yang mengurangi gesekan login bagi pengguna terpercaya.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Konsep 1: Logika Proposisional Otentikasi",
+        subtitle: "Pemodelan alur verifikasi login dengan Aljabar Boolean",
+        category: "BAB II & IV - LOGIKA MATEMATIKA",
+        content: `
+          <div class="space-y-6">
+            <p class="text-sm text-heading leading-relaxed">
+              Keputusan keberhasilan login (<span class="font-semibold text-primary">L</span>) dievaluasi secara dinamis berdasarkan 4 variabel proposisional yang mewakili lingkungan keamanan:
+            </p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="p-4 bg-amber-50/40 rounded-xl border border-border">
+                <div class="text-lg font-bold text-primary font-mono">p</div>
+                <div class="text-xs font-bold text-heading mt-1">Kredensial Valid</div>
+                <p class="text-[10px] text-secondary mt-1">Username, password & role benar</p>
+              </div>
+              <div class="p-4 bg-amber-50/40 rounded-xl border border-border">
+                <div class="text-lg font-bold text-primary font-mono">q</div>
+                <div class="text-xs font-bold text-heading mt-1">Akun Aktif</div>
+                <p class="text-[10px] text-secondary mt-1">Status pengguna tidak ditangguhkan</p>
+              </div>
+              <div class="p-4 bg-amber-50/40 rounded-xl border border-border">
+                <div class="text-lg font-bold text-primary font-mono">r</div>
+                <div class="text-xs font-bold text-heading mt-1">Perangkat Dikenal</div>
+                <p class="text-[10px] text-secondary mt-1">Opsi "Ingat Perangkat" aktif</p>
+              </div>
+              <div class="p-4 bg-amber-50/40 rounded-xl border border-border">
+                <div class="text-lg font-bold text-primary font-mono">s</div>
+                <div class="text-xs font-bold text-heading mt-1">Captcha Valid</div>
+                <p class="text-[10px] text-secondary mt-1">Jawaban matematika Captcha benar</p>
+              </div>
+            </div>
+
+            <div class="p-5 bg-white border border-border rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <div class="text-[10px] font-bold text-secondary tracking-widest uppercase">Formula Utama Aljabar Boolean</div>
+                <div class="text-xl md:text-2xl font-mono font-bold text-heading mt-1">
+                  L = (p &and; q &and; r) &or; (p &and; q &and; &not;r &and; s)
+                </div>
+              </div>
+              <div class="text-xs text-heading max-w-sm">
+                <strong>Aturan Logika:</strong> Login langsung disetujui jika kredensial benar, akun aktif, dan perangkat dikenali. Jika perangkat belum dikenal, pengguna wajib melewati Captcha (<span class="font-mono font-semibold">s</span>).
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Tabel Kebenaran (Truth Table) Otentikasi",
+        subtitle: "Evaluasi seluruh kombinasi masukan proposisi",
+        category: "BAB IV - PEMBAHASAN",
+        content: `
+          <div class="space-y-4">
+            <p class="text-xs text-heading">
+              Berikut adalah matriks keputusan aljabar boolean yang digunakan di dalam mesin evaluasi kode <code class="font-mono text-xs bg-amber-100/50 px-1 py-0.5 rounded">mathLogic.js</code>:
+            </p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-amber-50 text-heading border-b border-border font-bold">
+                    <th class="p-2 border border-border text-center">p</th>
+                    <th class="p-2 border border-border text-center">q</th>
+                    <th class="p-2 border border-border text-center">r</th>
+                    <th class="p-2 border border-border text-center">s</th>
+                    <th class="p-2 border border-border text-center">p &and; q &and; r</th>
+                    <th class="p-2 border border-border text-center">p &and; q &and; &not;r &and; s</th>
+                    <th class="p-2 border border-border text-center bg-primary/10 text-primary">Hasil (L)</th>
+                    <th class="p-2 border border-border">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-border">
+                  <tr>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700">T</td>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700">T</td>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700">T</td>
+                    <td class="p-2 border border-border text-center text-secondary">A</td>
+                    <td class="p-2 border border-border text-center font-semibold text-emerald-600">T</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700 bg-emerald-50">T</td>
+                    <td class="p-2 border border-border font-medium text-emerald-800">Login Sukses (Perangkat Terpercaya)</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700">T</td>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700">T</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700">T</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center font-semibold text-emerald-600">T</td>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700 bg-emerald-50">T</td>
+                    <td class="p-2 border border-border font-medium text-emerald-800">Login Sukses (Via Captcha)</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700">T</td>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700">T</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center font-bold text-red-600 bg-red-50">F</td>
+                    <td class="p-2 border border-border text-red-700">Gagal (Captcha Tidak Valid)</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 border border-border text-center font-bold text-emerald-700">T</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center text-secondary">A</td>
+                    <td class="p-2 border border-border text-center text-secondary">A</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center font-bold text-red-600 bg-red-50">F</td>
+                    <td class="p-2 border border-border text-red-700">Gagal (Akun Ditangguhkan)</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center text-secondary">A</td>
+                    <td class="p-2 border border-border text-center text-secondary">A</td>
+                    <td class="p-2 border border-border text-center text-secondary">A</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center text-red-600">F</td>
+                    <td class="p-2 border border-border text-center font-bold text-red-600 bg-red-50">F</td>
+                    <td class="p-2 border border-border text-red-700">Gagal (Kredensial Salah)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-[10px] text-secondary"><i>*A = Apapun (Keadaan bebas), T = True, F = False</i></p>
+          </div>
+        `
+      },
+      {
+        title: "Pohon Keputusan (Decision Tree) Login",
+        subtitle: "Visualisasi langkah evaluasi boolean terurut",
+        category: "BAB IV - PEMBAHASAN",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div class="space-y-4">
+              <p class="text-sm text-heading leading-relaxed">
+                Di antarmuka web, alur evaluasi diimplementasikan dalam bentuk <strong>Decision Tree Interaktif</strong>.
+              </p>
+              <p class="text-sm text-heading leading-relaxed">
+                Ketika pengguna memasukkan input, cabang pohon keputusan akan <strong>menyala dinamis</strong>:
+              </p>
+              <ul class="space-y-2 text-xs text-heading">
+                <li class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                  <span>Jalur Hijau: Kondisi bernilai <strong>True</strong></span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                  <span>Jalur Merah: Kondisi bernilai <strong>False</strong></span>
+                </li>
+              </ul>
+            </div>
+            
+            <!-- Ascii Decision Tree visual box -->
+            <div class="p-4 bg-amber-50/50 border border-border rounded-xl font-mono text-[10px] text-heading space-y-1 overflow-x-auto">
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ INPUT LOGIN ]</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kredensial Valid? (p)</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Ya)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Tidak) &rarr; [Gagal]</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Akun Aktif? (q)</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Ya)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Tidak) &rarr; [Gagal]</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;Ingat Perangkat? (r)</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\</div>
+              <div>&nbsp;&nbsp;&nbsp;(Ya)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Tidak)</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</div>
+              <div>[SUKSES]&nbsp;&nbsp;&nbsp;&nbsp;Captcha Valid? (s)</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Ya)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Tidak) &rarr; [Gagal]</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[SUKSES]</div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Konsep 2: Teori Himpunan & Peran Pengguna",
+        subtitle: "Pengelompokan user berdasarkan otorisasi peran",
+        category: "BAB II & IV - TEORI HIMPUNAN",
+        content: `
+          <div class="space-y-6">
+            <p class="text-sm text-heading leading-relaxed">
+              Otorisasi sistem memetakan pengguna ke dalam himpunan-himpunan bagian dari <strong>Himpunan Semesta (U)</strong> berdasarkan peran (Role) yang dipilih:
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+              <div class="p-4 bg-amber-50/40 rounded-xl border border-border">
+                <span class="text-primary font-bold text-sm block mb-1">U (Semesta)</span>
+                <span>Seluruh pengguna terdaftar:</span>
+                <div class="mt-2 text-heading font-bold">{Budi, Siti, Dewi, Gede, Anto}</div>
+              </div>
+              <div class="p-4 bg-amber-50/40 rounded-xl border border-border">
+                <span class="text-primary font-bold text-sm block mb-1">A (Admin)</span>
+                <span>Pengguna dengan peran Admin:</span>
+                <div class="mt-2 text-heading font-bold">{Budi, Gede, Anto}</div>
+              </div>
+              <div class="p-4 bg-amber-50/40 rounded-xl border border-border">
+                <span class="text-primary font-bold text-sm block mb-1">D (Dosen)</span>
+                <span>Pengguna dengan peran Dosen:</span>
+                <div class="mt-2 text-heading font-bold">{Budi, Siti, Dewi}</div>
+              </div>
+            </div>
+
+            <div class="p-5 bg-white border border-border rounded-2xl space-y-2">
+              <div class="text-[10px] font-bold text-secondary uppercase tracking-widest">Operasi Himpunan Hasil Evaluasi</div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+                <div>
+                  <span class="font-bold text-primary">Irisan (A &cap; D):</span>
+                  <div class="text-heading font-bold mt-0.5">{Budi} <span class="font-sans text-[10px] font-normal text-secondary">(Peran Ganda)</span></div>
+                </div>
+                <div>
+                  <span class="font-bold text-primary">Selisih (A - D):</span>
+                  <div class="text-heading font-bold mt-0.5">{Gede, Anto} <span class="font-sans text-[10px] font-normal text-secondary">(Hanya Admin)</span></div>
+                </div>
+                <div>
+                  <span class="font-bold text-primary">Selisih (D - A):</span>
+                  <div class="text-heading font-bold mt-0.5">{Siti, Dewi} <span class="font-sans text-[10px] font-normal text-secondary">(Hanya Dosen)</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Visualisasi Diagram Venn",
+        subtitle: "Representasi grafis SVG dari himpunan dan keanggotaan",
+        category: "BAB IV - PEMBAHASAN",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <div class="md:col-span-5 space-y-4">
+              <p class="text-sm text-heading leading-relaxed">
+                Diagram Venn interaktif diimplementasikan menggunakan <strong>grafik SVG dinamis</strong>.
+              </p>
+              <p class="text-sm text-heading leading-relaxed">
+                Setiap pengguna diposisikan di area yang sesuai:
+              </p>
+              <ul class="space-y-2 text-xs text-heading">
+                <li class="flex items-start gap-2">
+                  <span class="w-4 h-4 rounded-full border border-primary flex items-center justify-center text-[10px] text-primary font-bold">1</span>
+                  <span><strong>Budi</strong> berada di area tengah (Irisan/Intersection) karena memiliki peran Admin sekaligus Dosen.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="w-4 h-4 rounded-full border border-primary flex items-center justify-center text-[10px] text-primary font-bold">2</span>
+                  <span><strong>Siti & Dewi</strong> di lingkaran Dosen saja.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="w-4 h-4 rounded-full border border-primary flex items-center justify-center text-[10px] text-primary font-bold">3</span>
+                  <span><strong>Gede & Anto</strong> di lingkaran Admin saja.</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div class="md:col-span-7 flex justify-center">
+              <!-- Inline Venn Diagram SVG mockup -->
+              <svg width="280" height="200" viewBox="0 0 280 200" class="bg-amber-50/20 border border-border rounded-2xl p-2">
+                <!-- Outer Box Semesta -->
+                <rect x="5" y="5" width="270" height="190" rx="10" fill="none" stroke="#8C705F" stroke-width="1.5" stroke-dasharray="3,3"/>
+                <text x="15" y="20" font-family="Outfit" font-size="12" font-weight="bold" fill="#8C705F">U</text>
+                
+                <!-- Circle Admin -->
+                <circle cx="110" cy="105" r="70" fill="rgba(127, 83, 75, 0.08)" stroke="#7F534B" stroke-width="2" />
+                <text x="60" y="60" font-family="Outfit" font-size="12" font-weight="bold" fill="#7F534B">Admin (A)</text>
+                
+                <!-- Circle Dosen -->
+                <circle cx="170" cy="105" r="70" fill="rgba(140, 112, 95, 0.08)" stroke="#8C705F" stroke-width="2" />
+                <text x="175" y="60" font-family="Outfit" font-size="12" font-weight="bold" fill="#8C705F">Dosen (D)</text>
+                
+                <!-- Members -->
+                <text x="75" y="100" font-family="Outfit" font-size="10" font-weight="bold" fill="#1e1a1d">gede</text>
+                <text x="75" y="125" font-family="Outfit" font-size="10" font-weight="bold" fill="#1e1a1d">anto</text>
+                
+                <text x="130" y="110" font-family="Outfit" font-size="10" font-weight="bold" fill="#7F534B">budi</text>
+                
+                <text x="185" y="100" font-family="Outfit" font-size="10" font-weight="bold" fill="#1e1a1d">siti</text>
+                <text x="185" y="125" font-family="Outfit" font-size="10" font-weight="bold" fill="#1e1a1d">dewi</text>
+              </svg>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Konsep 3: Relasi Biner & Matriks Relasi",
+        subtitle: "Pemetaan data user-role sebagai pasangan terurut dan matriks biner",
+        category: "BAB II & IV - RELASI MATEMATIKA",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-4">
+              <h3 class="text-md font-bold text-primary">Relasi Biner (Pasangan Terurut)</h3>
+              <p class="text-xs text-heading leading-relaxed">
+                Relasi <span class="font-semibold text-primary">R</span> mendefinisikan hubungan keanggotaan antara himpunan Pengguna dan himpunan Peran:
+              </p>
+              <div class="p-3 bg-amber-50/40 border border-border rounded-xl font-mono text-[10px] text-heading leading-relaxed">
+                R = { (Budi, Admin), (Budi, Dosen), (Siti, Dosen), (Dewi, Dosen), (Gede, Admin), (Anto, Admin) }
+              </div>
+              <p class="text-xs text-heading">
+                Karena Budi berelasi dengan dua elemen di kodomain, relasi ini bertipe <strong>One-to-Many</strong> (Bukan Fungsi).
+              </p>
+            </div>
+            
+            <div class="space-y-3">
+              <h3 class="text-md font-bold text-primary">Representasi Matriks Relasi (M)</h3>
+              <div class="flex items-center gap-4">
+                <div class="font-mono text-xs font-bold text-heading">
+                  M = 
+                </div>
+                <div class="flex items-center font-mono text-sm">
+                  <span class="text-2xl font-light text-secondary">[</span>
+                  <table class="mx-2 text-center">
+                    <tr><td class="px-2 py-0.5">1</td><td class="px-2 py-0.5">1</td></tr>
+                    <tr><td class="px-2 py-0.5">0</td><td class="px-2 py-0.5">1</td></tr>
+                    <tr><td class="px-2 py-0.5">0</td><td class="px-2 py-0.5">1</td></tr>
+                    <tr><td class="px-2 py-0.5">1</td><td class="px-2 py-0.5">0</td></tr>
+                    <tr><td class="px-2 py-0.5">1</td><td class="px-2 py-0.5">0</td></tr>
+                  </table>
+                  <span class="text-2xl font-light text-secondary">]</span>
+                </div>
+                <div class="text-[10px] text-secondary font-mono space-y-0.5">
+                  <div>budi (Admin: 1, Dosen: 1)</div>
+                  <div>siti (Admin: 0, Dosen: 1)</div>
+                  <div>dewi (Admin: 0, Dosen: 1)</div>
+                  <div>gede (Admin: 1, Dosen: 0)</div>
+                  <div>anto (Admin: 1, Dosen: 0)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Konsep 4: Kriptografi Password",
+        subtitle: "Perbandingan Hashing Satu-Arah SHA-256 dan Cipher XOR",
+        category: "BAB II & IV - KRIPTOGRAFI",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-4 glass-panel p-5 rounded-2xl border-t-4 border-t-primary">
+              <div class="text-xs font-bold text-secondary uppercase">1. Hashing SHA-256 (One-Way)</div>
+              <h3 class="text-lg font-bold text-heading">Standar Industri</h3>
+              <p class="text-xs text-heading leading-relaxed">
+                Password diubah secara permanen menjadi 64 karakter heksadesimal (256-bit). Bersifat <strong>satu-arah</strong>, sehingga tidak ada fungsi dekripsi.
+              </p>
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-border font-mono text-[9px] text-heading truncate">
+                Contoh: budi123 &rarr; c0394336f33...
+              </div>
+              <div class="text-[10px] text-secondary leading-relaxed">
+                Proses di <code>crypto.js</code>: Padding block 512-bit, inisialisasi register dari pecahan akar prima, kompresi 64 putaran.
+              </div>
+            </div>
+            
+            <div class="space-y-4 glass-panel p-5 rounded-2xl border-t-4 border-t-secondary">
+              <div class="text-xs font-bold text-secondary uppercase">2. XOR Cipher (Symmetric)</div>
+              <h3 class="text-lg font-bold text-heading">Kalkulator Bitwise XOR</h3>
+              <p class="text-xs text-heading leading-relaxed">
+                Digunakan sebagai simulasi edukasi biner. Setiap karakter teks password di-XOR bitwise dengan Kunci <span class="font-mono bg-amber-100 px-1 py-0.5 rounded text-primary">K = 90</span> (biner: 01011010).
+              </p>
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-border font-mono text-[10px] text-heading">
+                P &oplus; K = C &nbsp;|&nbsp; C &oplus; K = P
+              </div>
+              <div class="text-[10px] text-secondary leading-relaxed">
+                Bersifat <strong>involutif</strong>, di mana operasi enkripsi dan dekripsi menggunakan fungsi biner matematika yang persis sama.
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Skenario Pengujian Sistem",
+        subtitle: "Hasil validasi login berdasarkan rancangan pengujian",
+        category: "BAB V - HASIL & ANALISIS",
+        content: `
+          <div class="space-y-4">
+            <p class="text-xs text-heading">
+              Sistem telah diuji menggunakan 5 skenario dengan hasil yang sesuai dengan rancangan pohon keputusan aljabar boolean:
+            </p>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-amber-50 text-heading border-b border-border font-bold">
+                    <th class="p-2 border border-border text-center">No</th>
+                    <th class="p-2 border border-border">Kondisi Pengujian (p, q, r, s)</th>
+                    <th class="p-2 border border-border text-center">Ekspektasi Hasil</th>
+                    <th class="p-2 border border-border text-center">Hasil Aktual</th>
+                    <th class="p-2 border border-border text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-border">
+                  <tr>
+                    <td class="p-2 border border-border text-center">1</td>
+                    <td class="p-2 border border-border">Kredensial Valid, Akun Aktif, Perangkat Terpercaya (T, T, T, -)</td>
+                    <td class="p-2 border border-border text-center text-emerald-700 font-semibold">Login Berhasil</td>
+                    <td class="p-2 border border-border text-center text-emerald-700 font-semibold">Login Berhasil</td>
+                    <td class="p-2 border border-border text-center"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold">SESUAI</span></td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 border border-border text-center">2</td>
+                    <td class="p-2 border border-border">Kredensial Valid, Akun Aktif, Perangkat Asing, Captcha Valid (T, T, F, T)</td>
+                    <td class="p-2 border border-border text-center text-emerald-700 font-semibold">Login Berhasil</td>
+                    <td class="p-2 border border-border text-center text-emerald-700 font-semibold">Login Berhasil</td>
+                    <td class="p-2 border border-border text-center"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold">SESUAI</span></td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 border border-border text-center">3</td>
+                    <td class="p-2 border border-border">Kredensial Salah (F, -, -, -)</td>
+                    <td class="p-2 border border-border text-center text-rose-600 font-semibold">Login Ditolak</td>
+                    <td class="p-2 border border-border text-center text-rose-600 font-semibold">Login Ditolak</td>
+                    <td class="p-2 border border-border text-center"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold">SESUAI</span></td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 border border-border text-center">4</td>
+                    <td class="p-2 border border-border">Akun Ditangguhkan/Tidak Aktif (T, F, -, -)</td>
+                    <td class="p-2 border border-border text-center text-rose-600 font-semibold">Login Ditolak</td>
+                    <td class="p-2 border border-border text-center text-rose-600 font-semibold">Login Ditolak</td>
+                    <td class="p-2 border border-border text-center"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold">SESUAI</span></td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 border border-border text-center">5</td>
+                    <td class="p-2 border border-border">Kredensial Valid, Perangkat Asing, Captcha Salah (T, T, F, F)</td>
+                    <td class="p-2 border border-border text-center text-rose-600 font-semibold">Login Ditolak</td>
+                    <td class="p-2 border border-border text-center text-rose-600 font-semibold">Login Ditolak</td>
+                    <td class="p-2 border border-border text-center"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold">SESUAI</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `
+      },
+      {
+        title: "Kesimpulan & Penutup",
+        subtitle: "Kesimpulan dari hasil pengembangan dan presentasi",
+        category: "BAB VI - PENUTUP",
+        content: `
+          <div class="text-center space-y-6">
+            <div class="inline-block p-4 rounded-2xl bg-amber-50 text-amber-700 mb-2">
+              <i data-lucide="check-circle" class="w-16 h-16 mx-auto"></i>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-heading">Kesimpulan Proyek</h2>
+            
+            <div class="max-w-2xl mx-auto text-sm text-heading leading-relaxed space-y-4">
+              <p>
+                Aplikasi <strong>MathSecure</strong> berhasil mengintegrasikan teori Matematika Diskrit (Logika, Himpunan, Relasi, dan Kriptografi) ke dalam implementasi sistem autentikasi kontekstual yang nyata.
+              </p>
+              <p>
+                Visualisasi interaktif seperti <strong>Venn Diagram SVG</strong>, <strong>Decision Tree Jalur Menyala</strong>, dan <strong>Laboratorium Kriptografi</strong> terbukti membantu mempermudah pemahaman konsep matematika yang abstrak bagi para mahasiswa.
+              </p>
+            </div>
+            
+            <div class="pt-6">
+              <div class="text-lg font-bold text-primary font-outfit">Sekian & Terima Kasih</div>
+              <p class="text-xs text-secondary mt-1">Apakah ada pertanyaan?</p>
+            </div>
+          </div>
+        `
+      }
+    ];
+
+    let currentIdx = 0;
+
+    // Load active slide content
+    function loadSlide(idx) {
+      if (idx < 0 || idx >= slidesData.length) return;
+      currentIdx = idx;
+      
+      const stage = document.getElementById('slide-stage');
+      const slide = slidesData[idx];
+      
+      // Update stage content with animation
+      stage.innerHTML = `
+        <div class="slide-active space-y-6">
+          <div class="flex items-center justify-between border-b border-border pb-3">
+            <span class="text-[10px] font-bold text-primary tracking-widest bg-primary/10 px-2.5 py-1 rounded-md">
+              ${slide.category}
+            </span>
+            <span class="text-xs text-secondary font-medium">
+              ${slide.subtitle}
+            </span>
+          </div>
+          <h2 class="text-2xl font-extrabold text-heading tracking-tight">
+            ${slide.title}
+          </h2>
+          <div class="mt-4 grow">
+            ${slide.content}
+          </div>
+        </div>
+      `;
+      
+      // Re-create icons via Lucide
+      lucide.createIcons();
+      
+      // Update counter
+      document.getElementById('slide-counter').innerText = `Slide ${idx + 1} dari ${slidesData.length}`;
+      
+      // Update buttons state
+      document.getElementById('btn-prev').disabled = idx === 0;
+      document.getElementById('btn-next').disabled = idx === slidesData.length - 1;
+      
+      // Highlight side menu item
+      updateSidebarHighlight(idx);
+      
+      // Update bullet indicators
+      updateBullets(idx);
+    }
+
+    function nextSlide() {
+      if (currentIdx < slidesData.length - 1) {
+        loadSlide(currentIdx + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIdx > 0) {
+        loadSlide(currentIdx - 1);
+      }
+    }
+
+    // Build sidebar menu links
+    function buildSidebar() {
+      const nav = document.getElementById('slide-nav');
+      nav.innerHTML = '';
+      slidesData.forEach((slide, idx) => {
+        const btn = document.createElement('button');
+        btn.onclick = () => loadSlide(idx);
+        btn.className = `w-full text-left text-xs py-2.5 px-3 rounded-xl font-medium transition flex items-start gap-2.5 cursor-pointer hover:bg-secondary/5`;
+        btn.id = `side-btn-${idx}`;
+        
+        btn.innerHTML = `
+          <span class="font-mono text-[10px] w-5 h-5 flex items-center justify-center rounded-lg border border-border text-secondary bg-amber-50/50 shrink-0">
+            ${String(idx + 1).padStart(2, '0')}
+          </span>
+          <span class="truncate text-heading font-semibold">${slide.title}</span>
+        `;
+        nav.appendChild(btn);
+      });
+    }
+
+    function updateSidebarHighlight(activeIdx) {
+      slidesData.forEach((_, idx) => {
+        const btn = document.getElementById(`side-btn-${idx}`);
+        if (btn) {
+          if (idx === activeIdx) {
+            btn.className = "w-full text-left text-xs py-2.5 px-3 rounded-xl font-semibold transition flex items-start gap-2.5 cursor-pointer bg-primary text-white";
+            const badge = btn.querySelector('span:first-child');
+            if (badge) badge.className = "font-mono text-[10px] w-5 h-5 flex items-center justify-center rounded-lg border border-white/20 text-white bg-white/20 shrink-0";
+          } else {
+            btn.className = "w-full text-left text-xs py-2.5 px-3 rounded-xl font-medium transition flex items-start gap-2.5 cursor-pointer hover:bg-secondary/5 text-heading";
+            const badge = btn.querySelector('span:first-child');
+            if (badge) badge.className = "font-mono text-[10px] w-5 h-5 flex items-center justify-center rounded-lg border border-border text-secondary bg-amber-50/50 shrink-0";
+          }
+        }
+      });
+    }
+
+    // Update bottom bullets
+    function buildBullets() {
+      const wrapper = document.getElementById('bullet-indicators');
+      wrapper.innerHTML = '';
+      slidesData.forEach((_, idx) => {
+        const bullet = document.createElement('button');
+        bullet.onclick = () => loadSlide(idx);
+        bullet.className = "w-2 h-2 rounded-full bg-border transition-all cursor-pointer";
+        bullet.id = `bullet-${idx}`;
+        wrapper.appendChild(bullet);
+      });
+    }
+
+    function updateBullets(activeIdx) {
+      slidesData.forEach((_, idx) => {
+        const bullet = document.getElementById(`bullet-${idx}`);
+        if (bullet) {
+          if (idx === activeIdx) {
+            bullet.className = "w-4 h-2 rounded-full bg-primary transition-all cursor-pointer";
+          } else {
+            bullet.className = "w-2 h-2 rounded-full bg-border transition-all cursor-pointer";
+          }
+        }
+      });
+    }
+
+    // Full screen slide view toggle
+    function toggleFullScreen() {
+      const el = document.documentElement;
+      if (!document.fullscreenElement) {
+        el.requestFullscreen().catch(err => {
+          alert(`Eror mengaktifkan layar penuh: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    // Initial setup
+    window.addEventListener('DOMContentLoaded', () => {
+      buildSidebar();
+      buildBullets();
+      loadSlide(0);
+    });
+
+    // ==========================================
+    // PPTX EXPORTER ENGINE (PptxGenJS API)
+    // ==========================================
+    function exportToPPTX() {
+      // 1. Create a new PPTX layout presentation (16:9)
+      const pptx = new PptxGenJS();
+      pptx.layout = 'LAYOUT_16x9';
+
+      // Design Palette
+      const COLOR_BG = 'E5F2C9';      // Earthy cream
+      const COLOR_CARD = 'FFFFFF';    // White
+      const COLOR_PRIMARY = '7F534B'; // Terracotta brown
+      const COLOR_SECONDARY = '8C705F'; // Secondary brown
+      const COLOR_HEADING = '1F0318'; // Dark purple-ish black
+      const COLOR_TEXT = '1E1A1D';    // Dark text
+
+      // ==========================================
+      // SLIDE 1: Title Slide
+      // ==========================================
+      {
+        const slide = pptx.addSlide();
+        slide.background = { fill: COLOR_BG };
+        
+        // Large Terracotta header box / frame
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0.5, y: 0.5, w: 9.0, h: 4.625,
+          fill: { color: COLOR_CARD },
+          line: { color: COLOR_SECONDARY, width: 2 }
+        });
+
+        // Small Accent Top Line
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0.5, y: 0.5, w: 9.0, h: 0.1,
+          fill: { color: COLOR_PRIMARY }
+        });
+
+        // Category Tag
+        slide.addText("STUDI KASUS MATEMATIKA DISKRIT", {
+          x: 0.8, y: 1.0, w: 8.4, h: 0.3,
+          fontSize: 11, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+        });
+
+        // Main Title
+        slide.addText("Sistem Autentikasi Berbasis React\ndan Kriptografi XOR", {
+          x: 0.8, y: 1.4, w: 8.4, h: 1.4,
+          fontSize: 32, fontFace: 'Trebuchet MS', color: COLOR_HEADING, bold: true
+        });
+
+        // Subtitle
+        slide.addText("Media Pembelajaran Logika Proposisional, Teori Himpunan, Relasi Biner & Hashing SHA-256", {
+          x: 0.8, y: 2.9, w: 8.4, h: 0.5,
+          fontSize: 14, fontFace: 'Arial', color: COLOR_SECONDARY, italic: true
+        });
+
+        // Members Label
+        slide.addText("Oleh Kelompok:", {
+          x: 0.8, y: 3.6, w: 8.4, h: 0.25,
+          fontSize: 10, fontFace: 'Arial', color: COLOR_SECONDARY, bold: true
+        });
+
+        // Members Names
+        slide.addText("1. M Risqullah Naufal  |  2. Lingzhi  |  3. Rafli Hanafi  |  4. Victor", {
+          x: 0.8, y: 3.9, w: 8.4, h: 0.3,
+          fontSize: 12, fontFace: 'Arial', color: COLOR_TEXT, bold: true
+        });
+
+        // Footer Dosen
+        slide.addText("Program Studi Teknik Informatika - Politeknik Caltex Riau  |  TA 2025/2026", {
+          x: 0.8, y: 4.5, w: 8.4, h: 0.3,
+          fontSize: 10, fontFace: 'Arial', color: COLOR_SECONDARY
+        });
+      }
+
+      // ==========================================
+      // helper to add a slide with standard master elements
+      // ==========================================
+      function createBaseSlide(category, title) {
+        const slide = pptx.addSlide();
+        slide.background = { fill: COLOR_BG };
+
+        // white content panel
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0.4, y: 0.4, w: 9.2, h: 4.825,
+          fill: { color: COLOR_CARD },
+          line: { color: 'E2E8F0', width: 1 }
+        });
+
+        // Category indicator (top-left)
+        slide.addText(category, {
+          x: 0.6, y: 0.6, w: 5.0, h: 0.25,
+          fontSize: 9, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+        });
+
+        // Title (top-left)
+        slide.addText(title, {
+          x: 0.6, y: 0.85, w: 7.0, h: 0.5,
+          fontSize: 20, fontFace: 'Trebuchet MS', color: COLOR_HEADING, bold: true
+        });
+
+        // Decorative side panel accent line
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0.4, y: 0.4, w: 0.08, h: 4.825,
+          fill: { color: COLOR_PRIMARY }
+        });
+
+        // Page number placeholder / footer
+        slide.addText("MathSecure - Sistem Autentikasi Kontekstual", {
+          x: 0.6, y: 4.95, w: 6.0, h: 0.2,
+          fontSize: 8, fontFace: 'Arial', color: COLOR_SECONDARY
+        });
+
+        return slide;
+      }
+
+      // ==========================================
+      // SLIDE 2: Latar Belakang & Masalah
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB I - PENDAHULUAN", "Latar Belakang & Rumusan Masalah");
+
+        // Column 1: Latar Belakang
+        slide.addText("Latar Belakang Proyek", {
+          x: 0.7, y: 1.5, w: 4.0, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+        });
+
+        slide.addText(
+          "• Pentingnya aspek keamanan siber pada sistem otentikasi akun web modern.\n" +
+          "• Konsep dasar pendukung keamanan (Logika Proposisional, Himpunan, Relasi) sering diajarkan secara sangat teoritis di perkuliahan.\n" +
+          "• Kebutuhan media simulasi interaktif agar mahasiswa dapat memanipulasi parameter boolean/matriks secara praktis dan visual.",
+          {
+            x: 0.7, y: 1.9, w: 4.1, h: 2.8,
+            fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT, lineSpacing: 22
+          }
+        );
+
+        // Column 2: Rumusan Masalah
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 5.1, y: 1.5, w: 4.2, h: 3.3,
+          fill: { color: 'FAF8F5' },
+          line: { color: 'E2D9D2', width: 1 }
+        });
+
+        slide.addText("Rumusan Masalah Utama", {
+          x: 5.3, y: 1.7, w: 3.8, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_HEADING, bold: true
+        });
+
+        slide.addText(
+          "1. Bagaimana memodelkan otentikasi login berdasarkan parameter lingkungan menggunakan Aljabar Boolean?\n\n" +
+          "2. Bagaimana memetakan hak otorisasi pengguna (Admin & Dosen) secara visual melalui Diagram Venn?\n\n" +
+          "3. Bagaimana memetakan relasi peran pengguna dalam bentuk representasi biner matriks?\n\n" +
+          "4. Bagaimana memperlihatkan tahapan enkripsi bitwise XOR dan hash SHA-256?",
+          {
+            x: 5.3, y: 2.1, w: 3.8, h: 2.6,
+            fontSize: 10, fontFace: 'Arial', color: COLOR_TEXT, lineSpacing: 18
+          }
+        );
+      }
+
+      // ==========================================
+      // SLIDE 3: Tujuan & Manfaat
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB I - PENDAHULUAN", "Tujuan & Manfaat Proyek");
+
+        // Column 1: Tujuan
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0.7, y: 1.6, w: 4.1, h: 3.1,
+          fill: { color: 'FFFFFF' },
+          line: { color: COLOR_PRIMARY, width: 1.5 }
+        });
+
+        slide.addText("Tujuan Penelitian", {
+          x: 0.9, y: 1.8, w: 3.7, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+        });
+
+        slide.addText(
+          "• Menerapkan ekspresi logika proposisional pada evaluasi login web.\n" +
+          "• Membuat modul pembelajaran interaktif berupa visualisasi Diagram Venn untuk materi Teori Himpunan.\n" +
+          "• Membangun representasi matriks relasi user-role biner.\n" +
+          "• Menguji modul simulator bitwise XOR dan enkripsi SHA-256.",
+          {
+            x: 0.9, y: 2.2, w: 3.7, h: 2.3,
+            fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT, lineSpacing: 22
+          }
+        );
+
+        // Column 2: Manfaat
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 5.1, y: 1.6, w: 4.1, h: 3.1,
+          fill: { color: 'FFFFFF' },
+          line: { color: COLOR_SECONDARY, width: 1.5 }
+        });
+
+        slide.addText("Manfaat Yang Dihasilkan", {
+          x: 5.3, y: 1.8, w: 3.7, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_SECONDARY, bold: true
+        });
+
+        slide.addText(
+          "• Bagi Akademik: Menyediakan perangkat ajar visual interaktif untuk mempermudah pemahaman Logika Diskrit bagi mahasiswa IT.\n" +
+          "• Bagi Pengembang: Membuka wawasan implementasi otentikasi berbasis context-aware untuk meningkatkan keamanan aplikasi tanpa merusak UX login pengguna terpercaya.",
+          {
+            x: 5.3, y: 2.2, w: 3.7, h: 2.3,
+            fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT, lineSpacing: 22
+          }
+        );
+      }
+
+      // ==========================================
+      // SLIDE 4: Logika Proposisional
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB II & IV - LOGIKA MATEMATIKA", "Logika Proposisional Otentikasi");
+
+        slide.addText("Dalam merancang evaluasi keamanan login, didefinisikan 4 proposisi biner berikut:", {
+          x: 0.7, y: 1.5, w: 8.5, h: 0.3,
+          fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT
+        });
+
+        // 4 Columns for Variables
+        const vars = [
+          { tag: "p (Kredensial)", desc: "Username, password, dan pilihan role sesuai database." },
+          { tag: "q (Akun Aktif)", desc: "Status akun tidak dinonaktifkan / ditangguhkan." },
+          { tag: "r (Perangkat)", desc: "Perangkat terdaftar ('Remember Device' aktif)." },
+          { tag: "s (Captcha)", desc: "Pengguna berhasil memasukkan Captcha matematika." }
+        ];
+
+        vars.forEach((v, idx) => {
+          const xPos = 0.7 + (idx * 2.1);
+          slide.addShape(pptx.ShapeType.rect, {
+            x: xPos, y: 1.9, w: 1.9, h: 1.6,
+            fill: { color: 'FAF8F5' },
+            line: { color: 'E2D9D2', width: 1 }
+          });
+
+          slide.addText(v.tag, {
+            x: xPos + 0.1, y: 2.0, w: 1.7, h: 0.3,
+            fontSize: 12, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+          });
+
+          slide.addText(v.desc, {
+            x: xPos + 0.1, y: 2.4, w: 1.7, h: 1.0,
+            fontSize: 10, fontFace: 'Arial', color: COLOR_TEXT
+          });
+        });
+
+        // Formula Bar
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0.7, y: 3.7, w: 8.2, h: 1.1,
+          fill: { color: 'FAF8F5' },
+          line: { color: COLOR_PRIMARY, width: 1 }
+        });
+
+        slide.addText("FORMULA ALJABAR BOOLEAN (L = KELAYAKAN LOGIN)", {
+          x: 0.9, y: 3.8, w: 7.8, h: 0.25,
+          fontSize: 9, fontFace: 'Trebuchet MS', color: COLOR_SECONDARY, bold: true
+        });
+
+        slide.addText("L = (p ∧ q ∧ r) ∨ (p ∧ q ∧ ¬r ∧ s)", {
+          x: 0.9, y: 4.1, w: 7.8, h: 0.4,
+          fontSize: 18, fontFace: 'Courier New', color: COLOR_HEADING, bold: true
+        });
+
+        slide.addText("*Login sukses jika kredensial valid (p) dan akun aktif (q), SERTA (perangkat dikenal (r) ATAU captcha valid (s)).", {
+          x: 0.9, y: 4.5, w: 7.8, h: 0.2,
+          fontSize: 8, fontFace: 'Arial', color: COLOR_SECONDARY, italic: true
+        });
+      }
+
+      // ==========================================
+      // SLIDE 5: Tabel Kebenaran
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB IV - PEMBAHASAN", "Tabel Kebenaran Otentikasi");
+
+        slide.addText("Evaluasi kombinasi logika proposisi login:", {
+          x: 0.7, y: 1.4, w: 8.5, h: 0.3,
+          fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT
+        });
+
+        // Add table representation
+        const rows = [
+          ["p", "q", "r", "s", "p ∧ q ∧ r", "p ∧ q ∧ ¬r ∧ s", "Hasil (L)", "Kasus Status"],
+          ["True", "True", "True", "Apapun", "True", "False", "True", "SUKSES: Login di Perangkat Terpercaya"],
+          ["True", "True", "False", "True", "False", "True", "True", "SUKSES: Login lewat Verifikasi Captcha"],
+          ["True", "True", "False", "False", "False", "False", "False", "GAGAL: Captcha tidak cocok"],
+          ["True", "False", "Apapun", "Apapun", "False", "False", "False", "GAGAL: Akun sedang ditangguhkan"],
+          ["False", "Apapun", "Apapun", "Apapun", "False", "False", "False", "GAGAL: Kredensial Salah / Tidak Valid"]
+        ];
+
+        slide.addTable(rows, {
+          x: 0.7, y: 1.8, w: 8.2, h: 3.0,
+          border: { pt: 1, color: 'D4DCC2' },
+          fill: 'FFFFFF',
+          fontSize: 9,
+          fontFace: 'Arial',
+          align: 'center',
+          valign: 'middle',
+          colW: [0.6, 0.6, 0.6, 0.8, 1.2, 1.4, 0.8, 2.2],
+        });
+      }
+
+      // ==========================================
+      // SLIDE 6: Pohon Keputusan (Decision Tree)
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB IV - PEMBAHASAN", "Pohon Keputusan (Decision Tree) Login");
+
+        // Column 1: Teori Pohon Keputusan
+        slide.addText("Logika Alur Pengambilan Keputusan", {
+          x: 0.7, y: 1.5, w: 4.2, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+        });
+
+        slide.addText(
+          "• Pohon keputusan membantu menyederhanakan rangkaian percabangan boolean rumit menjadi alur sekuensial yang mudah diikuti.\n\n" +
+          "• Dalam modul web, alur ini dihubungkan langsung ke state input pengguna, sehingga node pohon akan berubah warna secara real-time berdasarkan input.\n\n" +
+          "• Membantu melatih intuisi logika mahasiswa tentang signifikansi gerbang logika AND (&and;) dan OR (&or;).",
+          {
+            x: 0.7, y: 1.9, w: 4.2, h: 2.8,
+            fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT, lineSpacing: 20
+          }
+        );
+
+        // Column 2: ASCII Box representation
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 5.2, y: 1.5, w: 4.0, h: 3.3,
+          fill: { color: 'FAF8F5' },
+          line: { color: 'E2D9D2', width: 1 }
+        });
+
+        slide.addText(
+          "[INPUT DATA]\n" +
+          "       │\n" +
+          "  Kredensial Valid? (p)\n" +
+          "   ├───(Tidak)───► [LOGIN GAGAL]\n" +
+          "   └───(Ya)\n" +
+          "         │\n" +
+          "    Akun Aktif? (q)\n" +
+          "     ├───(Tidak)───► [LOGIN GAGAL]\n" +
+          "     └───(Ya)\n" +
+          "           │\n" +
+          "      Ingat Perangkat? (r)\n" +
+          "       ├───(Ya)──────────────► [LOGIN SUKSES]\n" +
+          "       └───(Tidak)\n" +
+          "             │\n" +
+          "        Captcha Valid? (s)\n" +
+          "         ├───(Ya)────────────► [LOGIN SUKSES]\n" +
+          "         └───(Tidak)──────────► [LOGIN GAGAL]",
+          {
+            x: 5.3, y: 1.7, w: 3.8, h: 3.0,
+            fontSize: 9, fontFace: 'Courier New', color: COLOR_HEADING, bold: true
+          }
+        );
+      }
+
+      // ==========================================
+      // SLIDE 7: Teori Himpunan & Notasi Peran
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB II & IV - TEORI HIMPUNAN", "Teori Himpunan & Peran Pengguna");
+
+        slide.addText("Otorisasi sistem memetakan pengguna ke dalam himpunan bagian berdasarkan peran:", {
+          x: 0.7, y: 1.4, w: 8.5, h: 0.3,
+          fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT
+        });
+
+        // 3 Cards for sets
+        const sets = [
+          { name: "Himpunan Semesta (U)", data: "U = { Budi, Siti, Dewi, Gede, Anto }", desc: "Seluruh pengguna terdaftar di basis data." },
+          { name: "Himpunan Admin (A)", data: "A = { Budi, Gede, Anto }", desc: "Pengguna dengan tingkat otorisasi Admin." },
+          { name: "Himpunan Dosen (D)", data: "D = { Budi, Siti, Dewi }", desc: "Pengguna dengan tingkat otorisasi Dosen." }
+        ];
+
+        sets.forEach((s, idx) => {
+          const xPos = 0.7 + (idx * 2.8);
+          slide.addShape(pptx.ShapeType.rect, {
+            x: xPos, y: 1.8, w: 2.6, h: 1.6,
+            fill: { color: 'FAF8F5' },
+            line: { color: 'E2D9D2', width: 1 }
+          });
+
+          slide.addText(s.name, {
+            x: xPos + 0.1, y: 1.9, w: 2.4, h: 0.3,
+            fontSize: 12, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+          });
+
+          slide.addText(s.data, {
+            x: xPos + 0.1, y: 2.3, w: 2.4, h: 0.4,
+            fontSize: 10, fontFace: 'Courier New', color: COLOR_HEADING, bold: true
+          });
+
+          slide.addText(s.desc, {
+            x: xPos + 0.1, y: 2.8, w: 2.4, h: 0.5,
+            fontSize: 9, fontFace: 'Arial', color: COLOR_TEXT
+          });
+        });
+
+        // Set Operations Bar
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0.7, y: 3.6, w: 8.2, h: 1.2,
+          fill: { color: 'FAF8F5' },
+          line: { color: COLOR_PRIMARY, width: 1 }
+        });
+
+        slide.addText("OPERASI HIMPUNAN HASIL PENENTUAN HAK AKSES", {
+          x: 0.9, y: 3.7, w: 7.8, h: 0.25,
+          fontSize: 9, fontFace: 'Trebuchet MS', color: COLOR_SECONDARY, bold: true
+        });
+
+        slide.addText(
+          "• Irisan (A ∩ D) = { Budi }\n" +
+          "• Selisih (A - D) = { Gede, Anto }\n" +
+          "• Selisih (D - A) = { Siti, Dewi }",
+          {
+            x: 0.9, y: 4.0, w: 7.8, h: 0.7,
+            fontSize: 11, fontFace: 'Courier New', color: COLOR_HEADING, bold: true, lineSpacing: 16
+          }
+        );
+      }
+
+      // ==========================================
+      // SLIDE 8: Visualisasi Diagram Venn
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB IV - PEMBAHASAN", "Visualisasi Diagram Venn");
+
+        // Column 1: Explanation
+        slide.addText("Visualisasi Diagram Venn Interaktif", {
+          x: 0.7, y: 1.5, w: 4.2, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+        });
+
+        slide.addText(
+          "• Diagram Venn memvisualisasikan relasi keanggotaan secara grafis menggunakan objek lingkaran SVG.\n\n" +
+          "• Area overlap mewakili irisan (A &cap; D), yaitu pengguna dengan hak akses ganda (Budi).\n\n" +
+          "• Memudahkan dosen/mahasiswa melihat status database simulasi secara instan tanpa membaca kode SQL database secara langsung.",
+          {
+            x: 0.7, y: 1.9, w: 4.2, h: 2.8,
+            fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT, lineSpacing: 20
+          }
+        );
+
+        // Column 2: Visual mockup representation using native PPTX shapes
+        const xCenter = 6.8;
+        const yCenter = 2.8;
+
+        // Venn circles on slide
+        slide.addShape(pptx.ShapeType.ellipse, {
+          x: xCenter - 1.2, y: yCenter - 0.9, w: 2.0, h: 2.0,
+          fill: { color: '7F534B', transparency: 85 },
+          line: { color: '7F534B', width: 2 }
+        });
+        slide.addText("A", {
+          x: xCenter - 1.0, y: yCenter - 1.1, w: 0.4, h: 0.3,
+          fontSize: 12, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+        });
+
+        slide.addShape(pptx.ShapeType.ellipse, {
+          x: xCenter - 0.2, y: yCenter - 0.9, w: 2.0, h: 2.0,
+          fill: { color: '8C705F', transparency: 85 },
+          line: { color: '8C705F', width: 2 }
+        });
+        slide.addText("D", {
+          x: xCenter + 0.8, y: yCenter - 1.1, w: 0.4, h: 0.3,
+          fontSize: 12, fontFace: 'Trebuchet MS', color: COLOR_SECONDARY, bold: true
+        });
+
+        // Add text labels inside circles
+        slide.addText("gede\nanto", {
+          x: xCenter - 1.0, y: yCenter - 0.2, w: 0.8, h: 0.6,
+          fontSize: 10, fontFace: 'Arial', color: COLOR_TEXT, align: 'center'
+        });
+
+        slide.addText("budi", {
+          x: xCenter - 0.1, y: yCenter, w: 0.8, h: 0.4,
+          fontSize: 11, fontFace: 'Arial', color: COLOR_PRIMARY, bold: true, align: 'center'
+        });
+
+        slide.addText("siti\ndewi", {
+          x: xCenter + 0.8, y: yCenter - 0.2, w: 0.8, h: 0.6,
+          fontSize: 10, fontFace: 'Arial', color: COLOR_TEXT, align: 'center'
+        });
+      }
+
+      // ==========================================
+      // SLIDE 9: Relasi & Matriks Relasi
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB II & IV - RELASI MATEMATIKA", "Relasi & Matriks Relasi Biner");
+
+        // Column 1: Relasi
+        slide.addText("Relasi Keanggotaan Peran", {
+          x: 0.7, y: 1.5, w: 4.2, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+        });
+
+        slide.addText(
+          "• Relasi biner menghubungkan domain User ke kodomain Role.\n\n" +
+          "• Dinyatakan dalam himpunan pasangan terurut:\n" +
+          "  R = { (Budi, Admin), (Budi, Dosen), (Siti, Dosen), (Dewi, Dosen), (Gede, Admin), (Anto, Admin) }\n\n" +
+          "• Tipe Relasi: One-to-Many. Oleh karena itu relasi ini tidak dapat dikategorikan sebagai fungsi.",
+          {
+            x: 0.7, y: 1.9, w: 4.2, h: 2.8,
+            fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT, lineSpacing: 20
+          }
+        );
+
+        // Column 2: Matrix representation
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 5.2, y: 1.5, w: 4.0, h: 3.3,
+          fill: { color: 'FAF8F5' },
+          line: { color: 'E2D9D2', width: 1 }
+        });
+
+        slide.addText("Representasi Matriks Biner (M)", {
+          x: 5.4, y: 1.7, w: 3.6, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_HEADING, bold: true
+        });
+
+        // Simple table representing matrix
+        const matrixRows = [
+          ["Pengguna", "Admin", "Dosen"],
+          ["Budi", "1", "1"],
+          ["Siti", "0", "1"],
+          ["Dewi", "0", "1"],
+          ["Gede", "1", "0"],
+          ["Anto", "1", "0"]
+        ];
+
+        slide.addTable(matrixRows, {
+          x: 5.4, y: 2.1, w: 3.6, h: 2.4,
+          border: { pt: 1, color: 'D4DCC2' },
+          fill: 'FFFFFF',
+          fontSize: 10,
+          fontFace: 'Arial',
+          align: 'center',
+          valign: 'middle'
+        });
+      }
+
+      // ==========================================
+      // SLIDE 10: Kriptografi Password
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB II & IV - KRIPTOGRAFI", "Kriptografi: SHA-256 vs XOR Cipher");
+
+        // Column 1: SHA-256
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0.7, y: 1.5, w: 4.1, h: 3.2,
+          fill: { color: 'FFFFFF' },
+          line: { color: COLOR_PRIMARY, width: 1.5 }
+        });
+
+        slide.addText("1. Hashing SHA-256", {
+          x: 0.9, y: 1.7, w: 3.7, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true
+        });
+
+        slide.addText(
+          "• Algoritma kriptografi satu-arah (One-way hashing) standar industri.\n" +
+          "• Menghasilkan digest sepanjang 256-bit (64 karakter heksadesimal).\n" +
+          "• Proses: Penyesuaian panjang pesan (padding), register inisialisasi pecahan akar bilangan prima, pemrosesan kompresi sebanyak 64 putaran.",
+          {
+            x: 0.9, y: 2.1, w: 3.7, h: 2.4,
+            fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT, lineSpacing: 20
+          }
+        );
+
+        // Column 2: XOR Cipher
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 5.1, y: 1.5, w: 4.1, h: 3.2,
+          fill: { color: 'FFFFFF' },
+          line: { color: COLOR_SECONDARY, width: 1.5 }
+        });
+
+        slide.addText("2. Enkripsi XOR Simetris", {
+          x: 5.3, y: 1.7, w: 3.7, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_SECONDARY, bold: true
+        });
+
+        slide.addText(
+          "• Digunakan untuk visualisasi akademis bitwise biner di laboratorium.\n" +
+          "• Setiap karakter di-XOR secara bitwise dengan kunci konstan K = 90 (01011010).\n" +
+          "• Sifat involutif: (P &oplus; K) &oplus; K = P. Enkripsi dan dekripsi menggunakan fungsi biner biner simetris yang sama.",
+          {
+            x: 5.3, y: 2.1, w: 3.7, h: 2.4,
+            fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT, lineSpacing: 20
+          }
+        );
+      }
+
+      // ==========================================
+      // SLIDE 11: Skenario Pengujian
+      // ==========================================
+      {
+        const slide = createBaseSlide("BAB V - HASIL & ANALISIS", "Skenario Pengujian & Hasil");
+
+        slide.addText("Hasil pengujian otentikasi berdasarkan parameter keamanan:", {
+          x: 0.7, y: 1.4, w: 8.5, h: 0.3,
+          fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT
+        });
+
+        // 5 Test Scenarios Table
+        const testRows = [
+          ["No", "Skenario Pengujian", "Hasil Ekspektasi", "Hasil Aktual", "Status"],
+          ["1", "Kredensial Valid, Akun Aktif, Perangkat Terpercaya", "Login Sukses", "Login Sukses", "Sesuai"],
+          ["2", "Kredensial Valid, Akun Aktif, Perangkat Asing, Captcha Valid", "Login Sukses", "Login Sukses", "Sesuai"],
+          ["3", "Kredensial Tidak Valid", "Login Ditolak", "Login Ditolak", "Sesuai"],
+          ["4", "Akun Ditangguhkan / Tidak Aktif", "Login Ditolak", "Login Ditolak", "Sesuai"],
+          ["5", "Kredensial Valid, Perangkat Asing, Captcha Salah", "Login Ditolak", "Login Ditolak", "Sesuai"]
+        ];
+
+        slide.addTable(testRows, {
+          x: 0.7, y: 1.8, w: 8.2, h: 3.0,
+          border: { pt: 1, color: 'D4DCC2' },
+          fill: 'FFFFFF',
+          fontSize: 10,
+          fontFace: 'Arial',
+          align: 'center',
+          valign: 'middle',
+          colW: [0.5, 3.7, 1.4, 1.4, 1.2],
+        });
+      }
+
+      // ==========================================
+      // SLIDE 12: Kesimpulan & Penutup
+      // ==========================================
+      {
+        const slide = pptx.addSlide();
+        slide.background = { fill: COLOR_BG };
+
+        // Center Panel
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 1.5, y: 1.0, w: 7.0, h: 3.625,
+          fill: { color: COLOR_CARD },
+          line: { color: COLOR_PRIMARY, width: 2 }
+        });
+
+        // Small Accent Line
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 1.5, y: 1.0, w: 7.0, h: 0.12,
+          fill: { color: COLOR_PRIMARY }
+        });
+
+        slide.addText("KESIMPULAN PROYEK", {
+          x: 2.0, y: 1.4, w: 6.0, h: 0.3,
+          fontSize: 14, fontFace: 'Trebuchet MS', color: COLOR_PRIMARY, bold: true, align: 'center'
+        });
+
+        slide.addText(
+          "1. Aplikasi MathSecure berhasil menjembatani teori matematika diskrit abstrak (Logika, Himpunan, Relasi, Kriptografi) dengan implementasi nyata pada web berbasis React.\n\n" +
+          "2. Fitur visualisasi interaktif (Venn, Decision Tree, Cryptography Lab) mempermudah proses pemahaman akademis.\n\n" +
+          "3. Penerapan Context-Aware Authentication berhasil menyeimbangkan aspek keamanan siber yang kuat dan kemudahan akses bagi pengguna sah.",
+          {
+            x: 2.0, y: 1.9, w: 6.0, h: 2.2,
+            fontSize: 11, fontFace: 'Arial', color: COLOR_TEXT, align: 'left', lineSpacing: 18
+          }
+        );
+
+        slide.addText("Sekian & Terima Kasih", {
+          x: 2.0, y: 4.1, w: 6.0, h: 0.35,
+          fontSize: 16, fontFace: 'Trebuchet MS', color: COLOR_HEADING, bold: true, align: 'center'
+        });
+      }
+
+      // 4. Trigger download
+      pptx.writeFile({ fileName: "MathSecure_Presentasi_Matematika_Diskrit.pptx" })
+        .then(() => {
+          alert("File PPTX berhasil digenerasi dan diunduh!");
+        })
+        .catch(err => {
+          alert("Gagal mengunduh file presentasi: " + err.message);
+        });
+    }
+  </script>
+</body>
+</html>
