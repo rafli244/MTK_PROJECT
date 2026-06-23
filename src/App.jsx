@@ -80,6 +80,11 @@ export default function App() {
     fetchUsers();
   }, []);
 
+  // =========================================================================
+  // ⚠️ LOGIKA SINKRONISASI DATA (WAJIB MASUK LAPORAN) ⚠️
+  // Pengikat masukan (data input binding) untuk sinkronisasi state
+  // username, password, dan ciphertext ke Venn Diagram dan Cryptography Lab
+  // =========================================================================
   // States to bind LoginForm inputs to the right-side visualizers (Sandbox)
   const [inputUsername, setInputUsername] = useState('');
   const [inputPassword, setInputPassword] = useState('');
@@ -305,6 +310,10 @@ export default function App() {
         <div>
           © 2026 Context-Aware Authentication System. All simulated data.
         </div>
+        {/* =========================================================================
+        // ⚠️ LOGIKA FORMULA DI LAYAR (WAJIB MASUK LAPORAN) ⚠️
+        // Representasi visual rumus Teori Himpunan, Aljabar Boolean, dan Hash di UI
+        // ========================================================================= */}
         <div className="font-mono-custom flex gap-3 text-[10px]">
           <span className="text-deep-purple-400">U = A ∪ D</span>
           <span className="text-parchment-700">|</span>
