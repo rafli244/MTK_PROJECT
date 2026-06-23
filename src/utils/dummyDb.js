@@ -1,5 +1,13 @@
 import { sha256 } from './crypto.js';
 
+// =========================================================================
+// ⚠️ LOGIKA MATEMATIKA UTAMA (WAJIB MASUK LAPORAN) ⚠️
+// 4. Teori Himpunan & Matriks Relasi Biner:
+//    - Himpunan Semesta (U) = Semua pengguna terdaftar
+//    - Himpunan Admin (A) = Pengguna dengan peran Admin
+//    - Himpunan Dosen (D) = Pengguna dengan peran Dosen
+//    - Matriks Biner M (5x2) = Memetakan relasi Many-to-Many
+// =========================================================================
 /**
  * MATRIKS RELASI MANY-TO-MANY (M)
  * Mengaitkan Himpunan Semesta Pengguna (U) dengan Himpunan Peran (R = [Admin, Dosen])

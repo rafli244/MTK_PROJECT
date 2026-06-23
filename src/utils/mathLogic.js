@@ -23,6 +23,11 @@ import bcryptjs from 'bcryptjs';
  * @returns {Object} - Complete truth value map of the logical terms
  */
 export function evaluateBooleanAuth(p, q, r, s) {
+  // =========================================================================
+  // ⚠️ LOGIKA MATEMATIKA UTAMA (WAJIB MASUK LAPORAN) ⚠️
+  // Rumus Logika Proposisional Aljabar Boolean:
+  // L = (p ∧ q ∧ r) ∨ (p ∧ q ∧ ¬r ∧ s)
+  // =========================================================================
   const L = (p && q && r) || (p && q && !r && s);
 
   return {
@@ -66,6 +71,14 @@ export function authenticateUser(username, password, selectedRole, rememberDevic
   }
 
   const roleValid = !!user && selectedRole && user.roles.includes(selectedRole);
+  // =========================================================================
+  // ⚠️ LOGIKA MATEMATIKA UTAMA (WAJIB MASUK LAPORAN) ⚠️
+  // Definisi Variabel Proposisi Keadaan Lingkungan:
+  // p (Kredensial Valid): Password benar dan Role yang dipilih cocok.
+  // q (Akun Aktif): Akun tidak dalam status ditangguhkan/suspended.
+  // r (Device Dikenal): Pengguna mencentang "Ingat Perangkat Ini".
+  // s (Captcha Valid): Pengguna menjawab captcha dengan benar.
+  // =========================================================================
   const p = passwordValid && roleValid;
 
   const q = !!user && user.isActive;

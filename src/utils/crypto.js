@@ -19,6 +19,14 @@ export function analyzePasswordCombinations(password) {
     else if (char >= "A" && char <= "Z") hasUppercase = true;
     else hasSymbols = true;
   }
+  // =========================================================================
+  // ⚠️ LOGIKA MATEMATIKA UTAMA (WAJIB MASUK LAPORAN) ⚠️
+  // Rumus Kombinatorika Kekuatan Kunci Sandi:
+  // Rumus : Total Kemungkinan Kombinasi = S^N
+  // di mana:
+  // S = Ukuran ruang set karakter (angka=10, lowercase=26, uppercase=26, simbol=32)
+  // N = Panjang karakter password
+  // =========================================================================
   let S = (hasNumbers ? 10 : 0) + (hasLowercase ? 26 : 0) + (hasUppercase ? 26 : 0) + (hasSymbols ? 32 : 0);
   let totalCombinations = Math.pow(S, N);
   let seconds = totalCombinations / 10000000000;
@@ -43,15 +51,15 @@ export function sha256(ascii) {
   function rightRotate(value, amount) {
     return (value >>> amount) | (value << (32 - amount));
   }
-  // Register nilai awal H0 - H7 ditulis dalam bilangan desimal murni
-  let h0 = 1779033703; // setara 0x6a09e667
-  let h1 = 3144134277; // setara 0xbb67ae85
-  let h2 = 1013904242; // setara 0x3c6ef372
-  let h3 = 2773483578; // setara 0xa54ff53a
-  let h4 = 1359899775; // setara 0x510e527f
-  let h5 = 2600822924; // setara 0x9b05688c
-  let h6 = 528771500;  // setara 0x1f83d9ab
-  let h7 = 1541459225; // setara 0x5be0cd19
+
+  let h0 = 1779033703; 
+  let h1 = 3144134277; 
+  let h2 = 1013904242; 
+  let h3 = 2773483578; 
+  let h4 = 1359899775; 
+  let h5 = 2600822924; 
+  let h6 = 528771500;  
+  let h7 = 1541459225; 
   const k = [
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
