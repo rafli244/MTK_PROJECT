@@ -1,5 +1,6 @@
 import { usersDb } from './dummyDb.js';
 import { sha256 } from './crypto.js';
+import bcryptjs from 'bcryptjs';
 
 /**
  * Propositional Variables:
@@ -49,7 +50,21 @@ export function evaluateBooleanAuth(p, q, r, s) {
  */
 export function authenticateUser(username, password, selectedRole, rememberDevice, captchaValid, users = usersDb) {
   const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
-  const passwordValid = !!user && sha256(password) === user.passwordCipher;
+  
+  let passwordValid = false;
+  if (user) {
+    if (user.passwordCipher && (user.passwordCipher.startsWith('$2a$') || user.passwordCipher.startsWith('$2b$'))) {
+      try {
+        passwordValid = bcryptjs.compareSync(password, user.passwordCipher);
+      } catch (e) {
+        console.error("Bcrypt sync compare failed, falling back to simple comparison", e);
+        passwordValid = sha256(password) === user.passwordCipher;
+      }
+    } else {
+      passwordValid = sha256(password) === user.passwordCipher;
+    }
+  }
+
   const roleValid = !!user && selectedRole && user.roles.includes(selectedRole);
   const p = passwordValid && roleValid;
 

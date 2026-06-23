@@ -179,8 +179,20 @@ export default function App() {
               <div className="section-label mb-3">Panel Otentikasi</div>
               {isSignUpMode ? (
                 <SignUpForm 
-                  onSignUpSuccess={() => {
+                  onSignUpSuccess={(newUser) => {
                     setIsSignUpMode(false);
+                    if (newUser) {
+                      setUsers(prevUsers => {
+                        const merged = [...prevUsers];
+                        const idx = merged.findIndex(u => u.username.toLowerCase() === newUser.username.toLowerCase());
+                        if (idx !== -1) {
+                          merged[idx] = { ...merged[idx], ...newUser };
+                        } else {
+                          merged.push(newUser);
+                        }
+                        return merged;
+                      });
+                    }
                     fetchUsers();
                   }}
                   onSwitchToLogin={() => setIsSignUpMode(false)}

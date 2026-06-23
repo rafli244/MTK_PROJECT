@@ -106,9 +106,9 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
 
     setIsLoading(true);
 
-    try {
-      // 1. Try to register directly to Supabase first if available (Vercel static deployment)
-      if (supabase) {
+    // 1. Try to register directly to Supabase first if available (Vercel static deployment)
+    if (supabase) {
+      try {
         // Cek username sudah ada
         const { data: existingUser } = await supabase
           .from('users')
@@ -160,6 +160,16 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
           message: 'Pendaftaran berhasil! Silakan login dengan akun Anda.'
         });
 
+        const registeredUser = {
+          id: data.id,
+          username: data.username,
+          name: data.name,
+          email: data.email,
+          roles: data.roles,
+          isActive: data.is_active,
+          passwordCipher: data.password_hash
+        };
+
         setFormData({
           username: '',
           name: '',
@@ -170,12 +180,25 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
         });
 
         setTimeout(() => {
-          onSignUpSuccess();
+          onSignUpSuccess(registeredUser);
         }, 2000);
+        setIsLoading(false);
         return;
+      } catch (err) {
+        console.warn("Direct Supabase registration failed, trying backend API fallback.", err);
+        if (err.message === 'Username sudah terdaftar' || err.message === 'Email sudah terdaftar') {
+          setAlertInfo({
+            type: 'error',
+            message: err.message
+          });
+          setIsLoading(false);
+          return;
+        }
       }
+    }
 
-      // 2. Fallback to Express Backend API
+    // 2. Fallback to Express Backend API
+    try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const response = await fetch(`${apiUrl}/api/auth/signup`, {
         method: 'POST',
@@ -203,7 +226,16 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
         message: 'Pendaftaran berhasil! Silakan login dengan akun Anda.'
       });
 
-      // Reset form
+      const registeredUser = {
+        id: data.data.id,
+        username: data.data.username,
+        name: data.data.name,
+        email: data.data.email,
+        roles: data.data.roles,
+        isActive: true,
+        passwordCipher: data.data.password_hash || ''
+      };
+
       setFormData({
         username: '',
         name: '',
@@ -213,16 +245,46 @@ export default function SignUpForm({ onSignUpSuccess, onSwitchToLogin }) {
         roles: ['Dosen']
       });
 
-      // Redirect ke login setelah 2 detik
       setTimeout(() => {
-        onSwitchToLogin();
+        onSignUpSuccess(registeredUser);
       }, 2000);
-
+      setIsLoading(false);
+      return;
     } catch (error) {
+      console.warn("Backend sign up API unavailable, performing local registration fallback.", error);
+
+      // 3. Fallback to Local Simulation
+      const { sha256 } = await import('../utils/crypto.js');
+      const passwordHash = sha256(formData.password);
+
+      const newUser = {
+        id: 'u' + Date.now(),
+        username: formData.username.trim(),
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        passwordCipher: passwordHash,
+        roles: formData.roles,
+        isActive: true,
+        avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${formData.username.trim()}`
+      };
+
       setAlertInfo({
-        type: 'error',
-        message: error.message || 'Terjadi kesalahan saat mendaftar'
+        type: 'success',
+        message: 'Pendaftaran berhasil secara lokal (Simulasi Sandbox)!'
       });
+
+      setFormData({
+        username: '',
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        roles: ['Dosen']
+      });
+
+      setTimeout(() => {
+        onSignUpSuccess(newUser);
+      }, 2000);
     } finally {
       setIsLoading(false);
     }
