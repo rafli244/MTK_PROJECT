@@ -1,3 +1,5 @@
+// SecurityProvider.jsx: Pengelola state sesi otentikasi global, sinkronisasi data Supabase,
+// deteksi ketidakaktifan (auto-logout), dan mitigasi keamanan (rate limiting & state clear).
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { usersDb } from '../utils/dummyDb.js';

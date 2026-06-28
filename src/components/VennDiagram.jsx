@@ -1,3 +1,5 @@
+// VennDiagram.jsx: Komponen visualisasi interaktif diagram Venn untuk teori himpunan, 
+// memetakan semesta pengguna (U) ke dalam himpunan Admin (A) dan Dosen (D).
 import React, { useState } from 'react';
 
 export default function VennDiagram({ highlightedUser, users }) {

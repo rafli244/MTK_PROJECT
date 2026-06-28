@@ -1,3 +1,5 @@
+// LogicSandbox.jsx: Panel interaktif untuk mensimulasikan pohon keputusan aljabar boolean 
+// dan diagram logika otentikasi p, q, r, s, g secara grafis.
 import React from 'react';
 import BooleanLogicMonitor from './BooleanLogicMonitor.jsx';
 

@@ -1,3 +1,5 @@
+// Dashboard.jsx: Tampilan dasbor utama yang memisahkan portal Dosen (kelola mahasiswa)
+// dan panel Admin (kelola keaktifan dan mengubah peran pengguna secara real-time).
 import React, { useState } from 'react';
 import { 
   Users, Shield, LogOut, CheckCircle, XCircle, BookOpen, 

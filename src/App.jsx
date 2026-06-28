@@ -1,3 +1,5 @@
+// App.jsx: Komponen utama (shell aplikasi) yang me-render tata letak halaman masuk, dasbor,
+// dan laboratorium matematika interaktif berdasarkan sesi otentikasi aktif.
 import React, { useState } from 'react';
 import LoginForm from './components/LoginForm.jsx';
 import SecurityChallenge from './components/SecurityChallenge.jsx';

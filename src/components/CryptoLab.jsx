@@ -1,3 +1,5 @@
+// CryptoLab.jsx: Laboratorium kriptografi interaktif yang mensimulasikan langkah-langkah
+// hashing biner beralgoritma SHA-1 dan menguji kekuatan kombinasi kata sandi.
 import React, { useState, useEffect } from 'react';
 import { analyzePasswordCombinations, explainSHA1 } from '../utils/crypto.js';
 

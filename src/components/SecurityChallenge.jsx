@@ -1,3 +1,5 @@
+// SecurityChallenge.jsx: Halaman verifikasi keamanan MFA (Captcha & Trusted Device) 
+// dengan persistence state (sessionStorage) dan visualisasi evaluasi logika proposisional L.
 import React, { useState, useEffect } from 'react';
 import { Shield, Key, Eye, CheckCircle, RefreshCw, XCircle } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';

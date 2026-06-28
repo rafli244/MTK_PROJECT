@@ -1,3 +1,5 @@
+// LoginForm.jsx: Menangani form login lokal dengan hash sandi (SHA-256) serta
+// memicu alur masuk Google OAuth (select_account prompt) yang terlindungi rate-limiting.
 import React, { useState, useEffect } from 'react';
 import { authenticateUser } from '../utils/mathLogic.js';
 import { sha256 } from '../utils/crypto.js';
