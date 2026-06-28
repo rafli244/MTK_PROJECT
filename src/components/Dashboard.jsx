@@ -4,7 +4,8 @@ import {
   GraduationCap, Calendar, Activity, Key, LayoutDashboard, ToggleLeft
 } from 'lucide-react';
 
-export default function Dashboard({ user, initialRole, onLogout, onUpdateUserStatus, users }) {
+export default function Dashboard({ user, initialRole, onLogout, onUpdateUserStatus, onUpdateUserRoles, users }) {
+  if (!user) return null;
   const [currentView, setCurrentView] = useState(initialRole);
   const isMultiRole = user.roles.includes('Admin') && user.roles.includes('Dosen');
   
@@ -18,6 +19,17 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
 
   const handleGradeChange = (id, newGrade) => {
     setStudents(students.map(s => s.id === id ? { ...s, grade: Number(newGrade) || 0 } : s));
+  };
+
+  const toggleRole = (userId, currentRoles) => {
+    if (!user.roles.includes('Admin')) {
+      alert('Akses ditolak: Hanya Admin yang dapat mengubah peran.');
+      return;
+    }
+    const newRoles = currentRoles.includes('Admin') ? ['Dosen'] : ['Admin'];
+    if (onUpdateUserRoles) {
+      onUpdateUserRoles(userId, newRoles);
+    }
   };
 
   const getSetLabel = (u) => {
@@ -89,7 +101,7 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
         </div>
       </div>
 
-      {currentView === 'Admin' ? (
+      {currentView === 'Admin' && user.roles.includes('Admin') ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 space-y-6">
             <div className="glass-panel-neon-purple p-5 rounded-2xl">
@@ -209,6 +221,12 @@ export default function Dashboard({ user, initialRole, onLogout, onUpdateUserSta
                           )}
                         </td>
                         <td className="p-3 text-right">
+                          <button
+                            onClick={() => toggleRole(u.id, u.roles)}
+                            className="px-3 py-1 rounded text-[10px] font-semibold cursor-pointer bg-deep-purple-950/40 text-deep-purple-300 border border-deep-purple-800/40 hover:bg-deep-purple-950/70 mr-1.5"
+                          >
+                            Set Peran: {u.roles.includes('Admin') ? 'Dosen' : 'Admin'}
+                          </button>
                           <button
                             onClick={() => onUpdateUserStatus(u.id, !u.isActive)}
                             className={`px-3 py-1 rounded text-[10px] font-semibold cursor-pointer ${

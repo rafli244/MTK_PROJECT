@@ -40,7 +40,9 @@ export const usersDb = [
     isActive: true,
     passwordCipher: sha256('budi123'),
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=budi',
-    email: 'budi.santoso@univ.ac.id'
+    email: 'budi.santoso@univ.ac.id',
+    oauthProvider: 'local',
+    oauthId: null
   },
   {
     id: 'u2',
@@ -50,7 +52,9 @@ export const usersDb = [
     isActive: true,
     passwordCipher: sha256('siti123'),
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=siti',
-    email: 'siti.rahma@univ.ac.id'
+    email: 'siti.rahma@univ.ac.id',
+    oauthProvider: 'local',
+    oauthId: null
   },
   {
     id: 'u3',
@@ -60,7 +64,9 @@ export const usersDb = [
     isActive: false, // Inactive account
     passwordCipher: sha256('adminabc'),
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=gede',
-    email: 'gede.wiguna@univ.ac.id'
+    email: 'gede.wiguna@univ.ac.id',
+    oauthProvider: 'local',
+    oauthId: null
   },
   {
     id: 'u4',
@@ -70,7 +76,9 @@ export const usersDb = [
     isActive: true,
     passwordCipher: sha256('anto123'),
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=anto',
-    email: 'anto.wijaya@univ.ac.id'
+    email: 'anto.wigaya@univ.ac.id',
+    oauthProvider: 'local',
+    oauthId: null
   },
   {
     id: 'u5',
@@ -80,7 +88,9 @@ export const usersDb = [
     isActive: true,
     passwordCipher: sha256('dewi123'),
     avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=dewi',
-    email: 'dewi.lestari@univ.ac.id'
+    email: 'dewi.lestari@univ.ac.id',
+    oauthProvider: 'local',
+    oauthId: null
   }
 ];
 

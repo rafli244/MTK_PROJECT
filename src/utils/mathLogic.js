@@ -10,7 +10,7 @@ import bcryptjs from 'bcryptjs';
  * s : Captcha Benar (jawaban Captcha valid)
  * 
  * Formula:
- * L = (p ∧ q ∧ r) ∨ (p ∧ q ∧ ¬r ∧ s)
+ * L = q ∧ ((p ∧ r) ∨ (p ∧ ¬r ∧ s) ∨ g)
  */
 
 /**
@@ -20,25 +20,22 @@ import bcryptjs from 'bcryptjs';
  * @param {boolean} q - Account active status
  * @param {boolean} r - Trusted device checkbox
  * @param {boolean} s - Captcha validity
+ * @param {boolean} g - Google OAuth validity
  * @returns {Object} - Complete truth value map of the logical terms
  */
-export function evaluateBooleanAuth(p, q, r, s) {
-  // =========================================================================
-  // ⚠️ LOGIKA MATEMATIKA UTAMA (WAJIB MASUK LAPORAN) ⚠️
-  // Rumus Logika Proposisional Aljabar Boolean:
-  // L = (p ∧ q ∧ r) ∨ (p ∧ q ∧ ¬r ∧ s)
-  // =========================================================================
-  const L = (p && q && r) || (p && q && !r && s);
+export function evaluateBooleanAuth(p, q, r, s, g = false) {
+  const L = q && ((p && r) || (p && !r && s) || g);
 
   return {
     p,
     q,
     r,
     s,
+    g,
     not_r: !r,
-    p_and_q: p && q,
     term1: p && q && r,
     term2: p && q && !r && s,
+    term3: g && q,
     L
   };
 }
@@ -51,9 +48,10 @@ export function evaluateBooleanAuth(p, q, r, s) {
  * @param {string} selectedRole - Role selected by the user
  * @param {boolean} rememberDevice - Represents 'r'
  * @param {boolean} captchaValid - Represents 's' (Captcha matches expected answer)
+ * @param {boolean} g - Represents 'g' (Google OAuth success)
  * @returns {Object} - Result details including boolean variables and evaluation logs
  */
-export function authenticateUser(username, password, selectedRole, rememberDevice, captchaValid, users = usersDb) {
+export function authenticateUser(username, password, selectedRole, rememberDevice, captchaValid, g = false, users = usersDb) {
   const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
   
   let passwordValid = false;
@@ -85,20 +83,35 @@ export function authenticateUser(username, password, selectedRole, rememberDevic
   const r = !!rememberDevice;
   const s = !!captchaValid;
 
-  const evaluation = evaluateBooleanAuth(p, q, r, s);
+  const evaluation = evaluateBooleanAuth(p, q, r, s, g);
 
   return {
     user,
-    variables: { p, q, r, s, roleValid },
+    variables: { p, q, r, s, g, roleValid },
     evaluation,
-    status: getAuthStatus(passwordValid, p, q, r, s, evaluation.L, roleValid)
+    status: getAuthStatus(passwordValid, p, q, r, s, g, evaluation.L, roleValid)
   };
 }
 
 /**
  * Determines the readable status of the authentication request
  */
-function getAuthStatus(passwordValid, p, q, r, s, L, roleValid) {
+function getAuthStatus(passwordValid, p, q, r, s, g, L, roleValid) {
+  if (g) {
+    if (!q) {
+      return {
+        code: 'ACCOUNT_SUSPENDED',
+        message: 'Login Gagal: Otentikasi Google valid (g=T) tetapi akun ditangguhkan (q=F). L = False.',
+        type: 'error'
+      };
+    }
+    return {
+      code: 'SUCCESS_GOOGLE',
+      message: 'Login Sukses via Google: L bernilai TRUE (Melalui q ∧ g)',
+      type: 'success'
+    };
+  }
+
   if (!passwordValid) {
     return {
       code: 'INVALID_CREDENTIALS',
