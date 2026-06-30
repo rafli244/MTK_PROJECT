@@ -133,10 +133,12 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
     }
 
     try {
+      // Gunakan env var eksplisit agar redirect ke Vercel, bukan localhost
+      const redirectBase = import.meta.env.VITE_REDIRECT_URL || window.location.origin;
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/callback',
+          redirectTo: redirectBase,
           queryParams: {
             prompt: 'select_account'
           }
