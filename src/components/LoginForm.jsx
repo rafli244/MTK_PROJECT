@@ -193,8 +193,9 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
       }
 
       try {
-        // Hash password dengan Bcrypt (cost factor = 10)
-        const passwordHash = bcryptjs.hashSync(password, 10);
+        // Hash password dengan SHA-256 terlebih dahulu, kemudian di-hash dengan Bcrypt (sesuai laporan hibrida)
+        const passwordSha = sha256(password);
+        const passwordHash = bcryptjs.hashSync(passwordSha, 10);
         const generatedId = crypto.randomUUID ? crypto.randomUUID() : 'local-' + Date.now();
 
         if (supabase) {
@@ -207,7 +208,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 name: fullName.trim(),
                 email: email.trim().toLowerCase(),
                 password_hash: passwordHash,
-                roles: ['Dosen'], // Dipaksa default Dosen demi keamanan
+                roles: ['Dosen'], // Dipaksa default Dosen saja
                 is_active: true,
                 avatar_url: `https://api.dicebear.com/7.x/adventurer/svg?seed=${username.trim()}`
               }
@@ -297,7 +298,14 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
 
         let isMatch = false;
         if (user.password_hash.startsWith('$2a$') || user.password_hash.startsWith('$2b$')) {
-          isMatch = await bcryptjs.compare(password, user.password_hash);
+          // 1. Coba verifikasi dengan pre-hash SHA-256 (Akun Baru / Sesuai Laporan)
+          const passwordSha = sha256(password);
+          isMatch = await bcryptjs.compare(passwordSha, user.password_hash);
+          
+          // 2. Fallback ke Bcrypt murni jika gagal (Akun Demo Lama di database)
+          if (!isMatch) {
+            isMatch = await bcryptjs.compare(password, user.password_hash);
+          }
         } else {
           isMatch = password === user.password_hash || sha256(password) === user.password_hash;
         }

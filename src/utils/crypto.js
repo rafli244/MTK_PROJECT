@@ -50,77 +50,8 @@ export function analyzePasswordCombinations(password) {
 }
 
 export function sha256(ascii) {
-  function rightRotate(value, amount) {
-    return (value >>> amount) | (value << (32 - amount));
-  }
-
-  let h0 = 1779033703; 
-  let h1 = 3144134277; 
-  let h2 = 1013904242; 
-  let h3 = 2773483578; 
-  let h4 = 1359899775; 
-  let h5 = 2600822924; 
-  let h6 = 528771500;  
-  let h7 = 1541459225; 
-  const k = [
-    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
-    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
-    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
-    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
-    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-    0x19a4c116, 0x1e376c82, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
-  ];
-
-  let msg = ascii + "\x80";
-  let asciiLength = ascii.length * 8;
-  while ((msg.length * 8) % 512 !== 448) msg += "\x00";
-
-  let words = [];
-  for (let i = 0; i < msg.length; i++) {
-    let wordIndex = i >> 2;
-    if (words[wordIndex] === undefined) words[wordIndex] = 0;
-    words[wordIndex] |= msg.charCodeAt(i) << (24 - (i % 4) * 8);
-  }
-  words.push((asciiLength / Math.pow(2, 32)) | 0, asciiLength | 0);
-
-  for (let i = 0; i < words.length; i += 16) {
-    let w = [];
-    for (let j = 0; j < 64; j++) {
-      if (j < 16) {
-        w[j] = words[i + j] | 0;
-      } else {
-        let s0 = rightRotate(w[j - 15], 7) ^ rightRotate(w[j - 15], 18) ^ (w[j - 15] >>> 3);
-        let s1 = rightRotate(w[j - 2], 17) ^ rightRotate(w[j - 2], 19) ^ (w[j - 2] >>> 10);
-        w[j] = (w[j - 16] + s0 + w[j - 7] + s1) | 0;
-      }
-    }
-
-    let a = h0, b = h1, c = h2, d = h3, e = h4, f = h5, g = h6, h = h7;
-    for (let j = 0; j < 64; j++) {
-      let S1 = rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25);
-      let ch = (e & f) ^ (~e & g);
-      let temp1 = (h + S1 + ch + k[j] + w[j]) | 0;
-      let S0 = rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22);
-      let maj = (a & b) ^ (a & c) ^ (b & c);
-      let temp2 = (S0 + maj) | 0;
-
-      h = g; g = f; f = e; e = (d + temp1) | 0; d = c; c = b; b = a; a = (temp1 + temp2) | 0;
-    }
-
-    h0 = (h0 + a) | 0; h1 = (h1 + b) | 0; h2 = (h2 + c) | 0; h3 = (h3 + d) | 0;
-    h4 = (h4 + e) | 0; h5 = (h5 + f) | 0; h6 = (h6 + g) | 0; h7 = (h7 + h) | 0;
-  }
-
-  let resultHex = "";
-  let registers = [h0, h1, h2, h3, h4, h5, h6, h7];
-  for (let i = 0; i < registers.length; i++) {
-    let regVal = (registers[i] >>> 0).toString(16);
-    while (regVal.length < 8) regVal = "0" + regVal;
-    resultHex += regVal;
-  }
-  return resultHex;
+  // Menggunakan library resmi js-sha256 dari npm sesuai laporan arsitektur
+  return jsSha256(ascii);
 }
 
 export function explainSHA256(text) {

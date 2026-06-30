@@ -58,7 +58,14 @@ export function authenticateUser(username, password, selectedRole, rememberDevic
   if (user) {
     if (user.passwordCipher && (user.passwordCipher.startsWith('$2a$') || user.passwordCipher.startsWith('$2b$'))) {
       try {
-        passwordValid = bcryptjs.compareSync(password, user.passwordCipher);
+        // 1. Coba verifikasi dengan pre-hash SHA-256 (Akun Baru / Sesuai Laporan)
+        const passwordSha = sha256(password);
+        passwordValid = bcryptjs.compareSync(passwordSha, user.passwordCipher);
+        
+        // 2. Fallback ke Bcrypt murni jika gagal (Akun Demo Lama di database)
+        if (!passwordValid) {
+          passwordValid = bcryptjs.compareSync(password, user.passwordCipher);
+        }
       } catch (e) {
         console.error("Bcrypt sync compare failed, falling back to simple comparison", e);
         passwordValid = sha256(password) === user.passwordCipher;
