@@ -174,7 +174,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
 
     // ──────────────── MODE REGISTRASI MANUAL (SIGN UP) ────────────────
     if (isSignUp) {
-      if (!username || !password || !email || !fullName || !selectedRole) {
+      if (!username || !password || !email || !fullName) {
         setAlertInfo({
           type: 'error',
           code: 'EMPTY_FIELDS',
@@ -207,7 +207,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
                 name: fullName.trim(),
                 email: email.trim().toLowerCase(),
                 password_hash: passwordHash,
-                roles: [selectedRole],
+                roles: ['Dosen'], // Dipaksa default Dosen demi keamanan
                 is_active: true,
                 avatar_url: `https://api.dicebear.com/7.x/adventurer/svg?seed=${username.trim()}`
               }
@@ -215,6 +215,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
 
           if (error) throw error;
         }
+
 
         setAlertInfo({
           type: 'success',
@@ -544,18 +545,20 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
             />
           </div>
 
-          <div>
-            <label className="text-xs font-bold block mb-1">{isSignUp ? 'Peran Awal' : 'Role'}</label>
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full border border-slate-300 bg-white px-3 py-1.5 text-sm"
-            >
-              {roleOptions.map((role) => (
-                <option key={role} value={role}>{role}</option>
-              ))}
-            </select>
-          </div>
+          {!isSignUp && (
+            <div>
+              <label className="text-xs font-bold block mb-1">Role</label>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className="w-full border border-slate-300 bg-white px-3 py-1.5 text-sm"
+              >
+                {roleOptions.map((role) => (
+                  <option key={role} value={role}>{role}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Captcha Block */}
           <div className="border border-slate-300 p-3 bg-slate-50 space-y-2">
