@@ -25,6 +25,11 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
   const [alertInfo, setAlertInfo] = useState(null);
   const [detectedUser, setDetectedUser] = useState(null);
 
+  // States untuk mode Registrasi Manual
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
+
   const [clickTimestamps, setClickTimestamps] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
   const [lockCountdown, setLockCountdown] = useState(0);
@@ -167,6 +172,81 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
     if (!checkRateLimit()) return;
     setAlertInfo(null);
 
+    // ──────────────── MODE REGISTRASI MANUAL (SIGN UP) ────────────────
+    if (isSignUp) {
+      if (!username || !password || !email || !fullName || !selectedRole) {
+        setAlertInfo({
+          type: 'error',
+          code: 'EMPTY_FIELDS',
+          message: 'Mohon lengkapi semua kolom pendaftaran.'
+        });
+        return;
+      }
+      if (!captchaValid) {
+        setAlertInfo({
+          type: 'error',
+          code: 'CAPTCHA_INVALID',
+          message: 'Registrasi Gagal: Jawaban Captcha tidak valid.'
+        });
+        refreshCaptcha();
+        return;
+      }
+
+      try {
+        // Hash password dengan Bcrypt (cost factor = 10)
+        const passwordHash = bcryptjs.hashSync(password, 10);
+        const generatedId = crypto.randomUUID ? crypto.randomUUID() : 'local-' + Date.now();
+
+        if (supabase) {
+          const { error } = await supabase
+            .from('users')
+            .insert([
+              {
+                id: generatedId,
+                username: username.trim().toLowerCase(),
+                name: fullName.trim(),
+                email: email.trim().toLowerCase(),
+                password_hash: passwordHash,
+                roles: [selectedRole],
+                is_active: true,
+                avatar_url: `https://api.dicebear.com/7.x/adventurer/svg?seed=${username.trim()}`
+              }
+            ]);
+
+          if (error) throw error;
+        }
+
+        setAlertInfo({
+          type: 'success',
+          code: 'SIGNUP_SUCCESS',
+          message: 'Pendaftaran berhasil! Silakan login menggunakan akun baru Anda.'
+        });
+
+        // Trigger refresh user list di parent jika callback diprovide
+        if (onSignUp) {
+          onSignUp();
+        }
+
+        // Reset form & kembali ke mode login
+        setIsSignUp(false);
+        setPassword('');
+        setEmail('');
+        setFullName('');
+        refreshCaptcha();
+        return;
+
+      } catch (err) {
+        console.error("Gagal melakukan registrasi manual:", err);
+        setAlertInfo({
+          type: 'error',
+          code: 'SIGNUP_FAILED',
+          message: err.message || 'Gagal mendaftarkan akun ke database.'
+        });
+        return;
+      }
+    }
+
+    // ──────────────── MODE MASUK (LOGIN) ────────────────
     if (!username || !password || !selectedRole) {
       setAlertInfo({
         type: 'error',
@@ -382,33 +462,66 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
         </div>
       )}
 
-      {/* Demo Accounts Panel */}
-      <div className="border border-slate-300 p-3 bg-slate-50">
-        <div className="text-xs font-bold text-slate-700 mb-2">Akun Demo (Klik untuk mengisi otomatis):</div>
-        <div className="flex flex-wrap gap-1.5">
-          {DEMO_ACCOUNTS.map((account) => (
-            <button
-              key={account.username}
-              type="button"
-              onClick={() => fillDemoAccount(account)}
-              className="text-xs font-mono border border-slate-400 bg-white hover:bg-slate-100 px-2.5 py-1 cursor-pointer"
-            >
-              {account.username} ({account.tag})
-            </button>
-          ))}
+      {/* Demo Accounts Panel (Sembunyikan saat Sign Up agar ringkas) */}
+      {!isSignUp && (
+        <div className="border border-slate-300 p-3 bg-slate-50">
+          <div className="text-xs font-bold text-slate-700 mb-2">Akun Demo (Klik untuk mengisi otomatis):</div>
+          <div className="flex flex-wrap gap-1.5">
+            {DEMO_ACCOUNTS.map((account) => (
+              <button
+                key={account.username}
+                type="button"
+                onClick={() => fillDemoAccount(account)}
+                className="text-xs font-mono border border-slate-400 bg-white hover:bg-slate-100 px-2.5 py-1 cursor-pointer"
+              >
+                {account.username} ({account.tag})
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Login Form Box */}
       <div className="border border-slate-300 p-5 bg-white">
         <div className="mb-4 text-center border-b border-slate-200 pb-3">
-          <h2 className="text-base font-bold text-slate-900">Sistem Otentikasi Kontekstual</h2>
+          <h2 className="text-base font-bold text-slate-900">
+            {isSignUp ? 'Registrasi Akun Baru' : 'Sistem Otentikasi Kontekstual'}
+          </h2>
           <p className="text-xs text-slate-600 mt-0.5">
-            Mengevaluasi variabel proposisional lingkungan masuk secara real-time.
+            {isSignUp ? 'Buat kredensial lokal baru di database Supabase.' : 'Mengevaluasi variabel proposisional lingkungan masuk secara real-time.'}
           </p>
         </div>
 
         <form onSubmit={handleInitialSubmit} className="space-y-3">
+          {/* Field khusus Registrasi Manual */}
+          {isSignUp && (
+            <>
+              <div>
+                <label className="text-xs font-bold block mb-1">Nama Lengkap</label>
+                <input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Masukkan nama lengkap Anda"
+                  className="w-full border border-slate-300 bg-white px-3 py-1.5 text-sm"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold block mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="contoh@domain.com"
+                  className="w-full border border-slate-300 bg-white px-3 py-1.5 text-sm"
+                  required
+                />
+              </div>
+            </>
+          )}
+
           <div>
             <label className="text-xs font-bold block mb-1">Username</label>
             <input
@@ -432,7 +545,7 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
           </div>
 
           <div>
-            <label className="text-xs font-bold block mb-1">Role</label>
+            <label className="text-xs font-bold block mb-1">{isSignUp ? 'Peran Awal' : 'Role'}</label>
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
@@ -468,47 +581,65 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
             />
           </div>
 
-          {/* Remember Device Checkbox */}
-          <div className="flex flex-col gap-2 py-1">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="rememberDevice"
-                checked={rememberDevice}
-                onChange={(e) => setRememberDevice(e.target.checked)}
-                className="w-4 h-4 cursor-pointer"
-              />
-              <label htmlFor="rememberDevice" className="text-xs font-semibold cursor-pointer select-none text-slate-700">
-                Ingat Perangkat Ini (r = True)
-              </label>
+          {/* Remember Device Checkbox (Sembunyikan saat Sign Up) */}
+          {!isSignUp && (
+            <div className="flex flex-col gap-2 py-1">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="rememberDevice"
+                  checked={rememberDevice}
+                  onChange={(e) => setRememberDevice(e.target.checked)}
+                  className="w-4 h-4 cursor-pointer"
+                />
+                <label htmlFor="rememberDevice" className="text-xs font-semibold cursor-pointer select-none text-slate-700">
+                  Ingat Perangkat Ini (r = True)
+                </label>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Submit Button */}
           <button
             type="submit"
             className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm cursor-pointer border-0"
           >
-            Sign In
+            {isSignUp ? 'Sign Up' : 'Sign In'}
           </button>
 
-          {/* Real Google OAuth Button */}
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="block text-center w-full py-2 border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm cursor-pointer mt-2"
-          >
-            Login dengan Google
-          </button>
+          {/* Real Google OAuth Button (Sembunyikan saat Sign Up) */}
+          {!isSignUp && (
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="block text-center w-full py-2 border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm cursor-pointer mt-2"
+            >
+              Login dengan Google
+            </button>
+          )}
 
-          {/* Navigation to Sign Up Info */}
+          {/* Toggle Mode Sign Up / Login */}
           <div className="text-center pt-3 border-t border-slate-200 mt-3">
-            <p className="text-xs text-slate-500 font-semibold leading-relaxed">
-              Registrasi dilakukan secara otomatis (Just-In-Time) saat pertama kali login menggunakan Google.
-            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setAlertInfo(null);
+                refreshCaptcha();
+              }}
+              className="text-xs text-blue-600 hover:text-blue-800 font-bold bg-transparent border-0 cursor-pointer"
+            >
+              {isSignUp ? 'Sudah punya akun? Masuk di sini' : 'Belum punya akun? Daftar gratis di sini'}
+            </button>
+            {!isSignUp && (
+              <p className="text-[10px] text-slate-400 mt-2 leading-relaxed">
+                Registrasi otomatis (JIT) juga tetap tersedia jika masuk langsung lewat Google.
+              </p>
+            )}
           </div>
         </form>
       </div>
     </div>
   );
 }
+
