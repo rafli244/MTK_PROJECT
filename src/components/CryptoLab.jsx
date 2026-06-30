@@ -272,10 +272,42 @@ export default function CryptoLab({ inputPassword, userCiphertext, targetUsernam
                 <strong>Padding di Belakang (Hash Kriptografi)</strong>: Digunakan agar pesan asli tetap terbaca secara sekuensial di awal blok. SHA-1 menambahkan bit penanda akhir pesan <code className="text-petal-frost-300">1</code> (<code className="text-petal-frost-300">10000000...</code>) diikuti bit <code className="text-petal-frost-300">0</code>, lalu diakhiri ukuran bit pesan asli (64-bit) di ujung paling belakang.
               </li>
               <li>
-                <strong>Padding di Depan (Register Angka/Tipe Data)</strong>: Digunakan saat menyeimbangkan angka biner kecil ke dalam register CPU 32-bit atau 64-bit (*Zero-Extension*). Dilakukan di depan agar **tidak mengubah nilai numerik asli** (contoh: biner <code className="text-petal-frost-300">101</code> [=5] di-padding depan menjadi <code className="text-petal-frost-300">00000101</code> tetap bernilai 5; jika di-padding belakang menjadi <code className="text-petal-frost-300">10100000</code> nilainya berubah menjadi 160).
+                <strong>Padding di Depan (Register Angka/Tipe Data)</strong>: Digunakan saat menyeimbangkan angka biner kecil ke dalam register CPU 32-bit atau 64-bit (*Zero-Extension*). Dilakukan di depan agar tidak mengubah nilai numerik asli (contoh: biner <code className="text-petal-frost-300">101</code> [=5] di-padding depan menjadi <code className="text-petal-frost-300">00000101</code> tetap bernilai 5; jika di-padding belakang menjadi <code className="text-petal-frost-300">10100000</code> nilainya berubah menjadi 160).
               </li>
             </ul>
+
+            {/* ── Klarifikasi: 512-bit Block vs 160-bit Output ── */}
+            <div className="mt-3 p-3 rounded-lg border border-lavender-400/30 bg-lavender-950/30">
+              <span className="text-lavender-300 font-bold text-[11px] uppercase tracking-wide block mb-2">
+                ❓ Klarifikasi: SHA-1 = 512 bit atau 160 bit?
+              </span>
+              <p className="text-parchment-300 text-[11px] mb-2">
+                SHA-1 memiliki <strong className="text-white">dua ukuran berbeda</strong> yang sering membingungkan — keduanya benar dan bukan kontradiksi:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                <div className="bg-deep-purple-950/50 border border-deep-purple-500/30 rounded p-2">
+                  <div className="text-deep-purple-300 font-bold mb-1">⚙️ Block Size = 512 bit</div>
+                  <div className="text-parchment-400">
+                    Ukuran <em>wadah pemrosesan internal</em>. Setiap putaran kompresi SHA-1 memakan 512-bit data sekaligus (= 16 kata × 32-bit). Inilah yang dimaksud "padding ke 512-bit".
+                  </div>
+                </div>
+                <div className="bg-petal-frost-950/30 border border-petal-frost-500/30 rounded p-2">
+                  <div className="text-petal-frost-300 font-bold mb-1">🔑 Digest / Output = 160 bit</div>
+                  <div className="text-parchment-400">
+                    Ukuran <em>hasil akhir hash</em> yang keluar dari SHA-1 — selalu tetap 160-bit (40 karakter heksadesimal), tidak peduli seberapa panjang input aslinya.
+                  </div>
+                </div>
+              </div>
+              <div className="mt-2 text-[10px] text-parchment-500 flex items-start gap-1.5">
+                <span className="text-lavender-400 mt-0.5 shrink-0">▸</span>
+                <span>
+                  <strong className="text-parchment-300">Analogi:</strong> Mesin pabrik memproses bahan baku dalam <strong className="text-white">wadah 512 liter</strong> (block size), tapi hasil produk akhirnya hanya <strong className="text-white">160 ml</strong> konsentrat (digest). Ukuran wadah ≠ ukuran hasil.
+                  <span className="text-lavender-400 ml-1">[Ref: FIPS PUB 180-4, NIST]</span>
+                </span>
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
     </div>
