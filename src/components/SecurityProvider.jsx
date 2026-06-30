@@ -68,31 +68,6 @@ export default function SecurityProvider({ children }) {
       }
     }
 
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/auth/users`);
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && Array.isArray(result.data)) {
-          setUsers(prevUsers => {
-            const merged = [...prevUsers];
-            result.data.forEach(dbUser => {
-              if (dbUser.username) {
-                const idx = merged.findIndex(u => u.username && u.username.toLowerCase() === dbUser.username.toLowerCase());
-                if (idx !== -1) {
-                  merged[idx] = { ...merged[idx], ...dbUser };
-                } else {
-                  merged.push(dbUser);
-                }
-              }
-            });
-            return merged;
-          });
-        }
-      }
-    } catch (err) {
-      console.warn("Backend users API unavailable, falling back to local static users list.", err);
-    }
   };
 
   const handleSupabaseSession = async (supabaseUser) => {

@@ -285,97 +285,36 @@ export default function LoginForm({ onLoginSuccess, onInputChange, users, onSign
         return;
 
       } catch (err) {
-        console.warn("Direct Supabase login failed, trying backend API URL fallback.", err);
+        console.warn("Direct Supabase login failed, falling back to local dummyDb.", err);
       }
     }
 
-    // 2. Express Backend API Fallback
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${apiUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username.trim(),
-          password: password,
-          selectedRole: selectedRole,
-          rememberDevice: rememberDevice,
-          deviceId: 'simulated-device-id',
-          deviceName: 'Browser Sandbox'
-        })
+    // 2. Fallback ke local dummyDb (untuk demo offline / Supabase tidak tersedia)
+    const authResult = authenticateUser(username, password, selectedRole, rememberDevice, captchaValid, false, users);
+    const { status } = authResult;
+
+    if (status.type === 'error') {
+      setAlertInfo({
+        type: 'error',
+        code: status.code,
+        message: status.message
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setAlertInfo({
-          type: 'error',
-          code: data.code || 'INVALID_CREDENTIALS',
-          message: data.message || 'Login gagal.'
-        });
-        
-        if (data.code === 'CAPTCHA_INVALID') {
-          refreshCaptcha();
-        }
-        return;
-      }
-
-      if (!captchaValid && !rememberDevice) {
-        setAlertInfo({
-          type: 'error',
-          code: 'CAPTCHA_INVALID',
-          message: 'Login Gagal: Perangkat baru dan Captcha tidak valid.'
-        });
+      if (status.code === 'CAPTCHA_INVALID') {
         refreshCaptcha();
-        return;
       }
+      return;
+    }
 
+    if (status.type === 'success') {
       setAlertInfo({
         type: 'success',
-        code: rememberDevice ? 'SUCCESS_TRUSTED' : 'SUCCESS_CAPTCHA',
-        message: data.message || 'Login berhasil.'
+        code: status.code,
+        message: status.message
       });
 
-      const loggedInUser = {
-        ...data.data,
-        passwordCipher: password ? sha256(password) : ''
-      };
-
       setTimeout(() => {
-        onLoginSuccess(loggedInUser, selectedRole);
+        onLoginSuccess(authResult.user, selectedRole);
       }, 1500);
-
-    } catch (error) {
-      console.warn("Backend login API unavailable, trying local dummy db fallback.", error);
-      
-      const authResult = authenticateUser(username, password, selectedRole, rememberDevice, captchaValid, false, users);
-      const { status } = authResult;
-
-      if (status.type === 'error') {
-        setAlertInfo({
-          type: 'error',
-          code: status.code,
-          message: status.message
-        });
-        if (status.code === 'CAPTCHA_INVALID') {
-          refreshCaptcha();
-        }
-        return;
-      }
-
-      if (status.type === 'success') {
-        setAlertInfo({
-          type: 'success',
-          code: status.code,
-          message: status.message
-        });
-
-        setTimeout(() => {
-          onLoginSuccess(authResult.user, selectedRole);
-        }, 1500);
-      }
     }
   };
 
